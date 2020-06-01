@@ -108,7 +108,9 @@ function Home() {
                 key={id}
                 type='button'
                 className='list-group-item list-group-item-action'
-                onClick={() => navigate(`/ad-account/${id}`)}
+                onClick={() =>
+                  navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
+                }
               >
                 {name}
               </button>

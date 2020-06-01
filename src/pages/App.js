@@ -14,7 +14,7 @@ import AdAccount from './AdAccount'
 // self-defined-components
 const App = () => {
   return (
-    <Router primary={false}>
+    <Router basepath="/facebook-ad-account-dashboard" primary={false}>
       <Home path='/' />
       <AdAccount path='/ad-account/:adAccountId' />
     </Router>
