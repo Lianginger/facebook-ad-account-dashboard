@@ -1,22 +1,25 @@
 {
   "files": {
-    "main.js": "/facebook-ad-account-dashboard/static/js/main.e09d1a70.chunk.js",
-    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.e09d1a70.chunk.js.map",
+    "main.css": "/facebook-ad-account-dashboard/static/css/main.96288a09.chunk.css",
+    "main.js": "/facebook-ad-account-dashboard/static/js/main.fd420b4b.chunk.js",
+    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.fd420b4b.chunk.js.map",
     "runtime-main.js": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js",
     "runtime-main.js.map": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js.map",
     "static/css/2.69121389.chunk.css": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css",
-    "static/js/2.4ca2a104.chunk.js": "/facebook-ad-account-dashboard/static/js/2.4ca2a104.chunk.js",
-    "static/js/2.4ca2a104.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.4ca2a104.chunk.js.map",
+    "static/js/2.3c6248fb.chunk.js": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js",
+    "static/js/2.3c6248fb.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js.map",
     "index.html": "/facebook-ad-account-dashboard/index.html",
-    "precache-manifest.44eb6b33fca1ab42c24106744c4804b2.js": "/facebook-ad-account-dashboard/precache-manifest.44eb6b33fca1ab42c24106744c4804b2.js",
+    "precache-manifest.38c83b944b7ac449fddd542efa827265.js": "/facebook-ad-account-dashboard/precache-manifest.38c83b944b7ac449fddd542efa827265.js",
     "service-worker.js": "/facebook-ad-account-dashboard/service-worker.js",
     "static/css/2.69121389.chunk.css.map": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css.map",
-    "static/js/2.4ca2a104.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.4ca2a104.chunk.js.LICENSE.txt"
+    "static/css/main.96288a09.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.96288a09.chunk.css.map",
+    "static/js/2.3c6248fb.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dba334fc.js",
     "static/css/2.69121389.chunk.css",
-    "static/js/2.4ca2a104.chunk.js",
-    "static/js/main.e09d1a70.chunk.js"
+    "static/js/2.3c6248fb.chunk.js",
+    "static/css/main.96288a09.chunk.css",
+    "static/js/main.fd420b4b.chunk.js"
   ]
 }
