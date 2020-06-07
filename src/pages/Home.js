@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { navigate } from '@reach/router'
+import { format } from './utils'
+
+import './Home.css'
 
 function Home() {
   const [adAccounts, setAdAccounts] = useState([])
@@ -100,39 +103,71 @@ function Home() {
       </div>
 
       {/* 廣告帳戶列表 */}
-      <main className='col-12 col-md-6 m-auto'>
-        {adAccounts.length > 0 ? (
-          <div className='list-group'>
-            {adAccounts.map(({ name, id }) => (
-              <button
-                key={id}
-                type='button'
-                className='list-group-item list-group-item-action'
+
+      {adAccounts.length > 0 ? (
+        <main className='d-flex flex-wrap justify-content-center'>
+          {adAccounts.map(({ name, id, adAccountLive, amount_spent }) => (
+            <div
+              key={id}
+              class='card m-1 ad-account-card'
+              style={{ width: '18rem' }}
+            >
+              <div
+                class='card-body'
                 onClick={() =>
                   navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
                 }
               >
-                {name}
-              </button>
-            ))}
-          </div>
-        ) : (
-          ''
-        )}
-      </main>
+                <h5 class='card-title'>{name}</h5>
+                {adAccountLive ? (
+                  <p className='text-success'>ACTIVE</p>
+                ) : (
+                  <p className='text-secondary'>PAUSED</p>
+                )}
+                <p class='card-text'>
+                  總廣告花費：{format(amount_spent).toDollar()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </main>
+      ) : (
+        ''
+      )}
     </div>
   )
 
   function fetchUserAndAdAccounts() {
     window.FB.api(
-      '/me?fields=name,picture{url},adaccounts{name,account_id,age}',
+      '/me?fields=name,picture{url},adaccounts.limit(1000){age,name,amount_spent,campaigns.limit(1000){status,name}}',
       function (res) {
         setUser((state) => ({
           ...state,
           name: res.name,
           pictureURL: res.picture.data.url,
         }))
-        setAdAccounts(res.adaccounts.data)
+
+        let sortedAdAccountsData = res.adaccounts.data.sort(
+          (a, b) => a.age - b.age
+        )
+        // 遍歷廣告活動狀態，在廣告帳戶物件加上 adAccountLive flag
+        sortedAdAccountsData = sortedAdAccountsData.map((adAccount) => {
+          adAccount.adAccountLive = false
+          if (adAccount.campaigns) {
+            const activeAdCampaign = adAccount.campaigns.data.find(
+              (adCampaign) => {
+                return adCampaign.status === 'ACTIVE'
+              }
+            )
+
+            if (activeAdCampaign) {
+              adAccount.adAccountLive = true
+            }
+          }
+
+          return adAccount
+        })
+        setAdAccounts((state) => [...sortedAdAccountsData])
       }
     )
   }
