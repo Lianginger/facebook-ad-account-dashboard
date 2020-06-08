@@ -115,7 +115,50 @@ function AdAccount({ adAccountId }) {
           })
         })
     }
-  }, [adAccountId])
+
+    function fetchAdAccountInsights(cursorKey = '', cursorValue = '') {
+      setLoading(true)
+      fetch(
+        // `http://localhost:8000/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
+        `https://fb-ads-api.herokuapp.com/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          // console.log(res)
+          setAdAccount((state) => {
+            state.data = formatDataMart(res.data)
+          })
+          setPaging(res.paging)
+          setLoading(false)
+        })
+    }
+
+    function formatDataMart(rawData) {
+      const dataMart = {}
+      rawData.forEach((data) => {
+        const date = data.date_start
+        const campaignType = getCampaignType(data)
+
+        dataMart[date]
+          ? dataMart[date][campaignType]
+            ? dataMart[date][campaignType].push(data)
+            : (dataMart[date][campaignType] = [data])
+          : (dataMart[date] = { [campaignType]: [data] })
+      })
+      // console.log('dataMart:', dataMart)
+      return dataMart
+    }
+
+    function getCampaignType(data) {
+      return data.campaign_name.includes('預熱')
+        ? '預熱'
+        : data.campaign_name.includes('前測')
+        ? '前測'
+        : data.campaign_name.includes('嘖嘖')
+        ? '嘖嘖'
+        : 'none'
+    }
+  }, [adAccountId, setAdAccount])
 
   useEffect(() => {
     generateChartData()
@@ -128,12 +171,12 @@ function AdAccount({ adAccountId }) {
       let fundRaisingSpendArray = []
       let adsDirectRoasArray = []
 
-      Object.values(adAccount.data).map((dateData) => {
+      Object.values(adAccount.data).forEach((dateData) => {
         if (dateData['預熱']) {
           const adCampaignArray = dateData['預熱']
           let totalSpend = 0
 
-          adCampaignArray.map((adCampaign) => {
+          adCampaignArray.forEach((adCampaign) => {
             if (parseInt(adCampaign.spend) === 0) {
               return
             }
@@ -156,7 +199,7 @@ function AdAccount({ adAccountId }) {
           let totalSpend = 0
           let totalLead = 0
 
-          adCampaignArray.map((adCampaign) => {
+          adCampaignArray.forEach((adCampaign) => {
             if (parseInt(adCampaign.spend) === 0 || !adCampaign.actions) {
               return
             }
@@ -189,7 +232,7 @@ function AdAccount({ adAccountId }) {
           let totalSpend = 0
           let totalRevenue = 0
 
-          adCampaignArray.map((adCampaign) => {
+          adCampaignArray.forEach((adCampaign) => {
             if (parseInt(adCampaign.spend) === 0 || !adCampaign.action_values) {
               return
             }
@@ -226,7 +269,7 @@ function AdAccount({ adAccountId }) {
         state.adsDirectRoasArray = adsDirectRoasArray
       })
     }
-  }, [adAccount.data])
+  }, [adAccount.data, setAdAccount])
 
   useEffect(() => {
     const platformId = adAccount.platformId
@@ -253,7 +296,7 @@ function AdAccount({ adAccountId }) {
           }))
         })
     }
-  }, [adAccount.platformId, adAccount.projectId])
+  }, [adAccount.platformId, adAccount.projectId, setProject])
 
   useEffect(() => {
     if (!project.timeline) return
@@ -267,7 +310,7 @@ function AdAccount({ adAccountId }) {
     projectStartAt = projectStartAt - 60 * 60
 
     const timelineDataMart = {}
-    project.timeline.map((data) => {
+    project.timeline.forEach((data) => {
       if (data[0] < projectStartAt || data[0] > projectFinishAt) return
 
       const date = format(data[0] * 1000).toDate()
@@ -290,7 +333,7 @@ function AdAccount({ adAccountId }) {
     setProject((state) => {
       state.dailyFundingDiff = dailyFundingDiff
     })
-  }, [project.timeline])
+  }, [project.timeline, project.started_at, project.finished_at, setProject])
 
   useEffect(() => {
     if (
@@ -298,7 +341,7 @@ function AdAccount({ adAccountId }) {
       adAccount.fundRaisingSpendArray.length > 0
     ) {
       const totalRoasArray = []
-      adAccount.dateArray.map((date, index) => {
+      adAccount.dateArray.forEach((date, index) => {
         if (
           project.dailyFundingDiff[date] &&
           adAccount.fundRaisingSpendArray[index]
@@ -317,7 +360,12 @@ function AdAccount({ adAccountId }) {
         state.totalRoasArray = totalRoasArray
       })
     }
-  }, [project.dailyFundingDiff, adAccount.fundRaisingSpendArray])
+  }, [
+    project.dailyFundingDiff,
+    adAccount.fundRaisingSpendArray,
+    adAccount.dateArray,
+    setAdAccount,
+  ])
 
   return (
     <div className='container my-3'>
@@ -458,49 +506,6 @@ function AdAccount({ adAccountId }) {
       )}
     </div>
   )
-
-  function fetchAdAccountInsights(cursorKey = '', cursorValue = '') {
-    setLoading(true)
-    fetch(
-      // `http://localhost:8000/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
-      `https://fb-ads-api.herokuapp.com/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        // console.log(res)
-        setAdAccount((state) => {
-          state.data = formatDataMart(res.data)
-        })
-        setPaging(res.paging)
-        setLoading(false)
-      })
-  }
-
-  function formatDataMart(rawData) {
-    const dataMart = {}
-    rawData.map((data) => {
-      const date = data.date_start
-      const campaignType = getCampaignType(data)
-
-      dataMart[date]
-        ? dataMart[date][campaignType]
-          ? dataMart[date][campaignType].push(data)
-          : (dataMart[date][campaignType] = [data])
-        : (dataMart[date] = { [campaignType]: [data] })
-    })
-    // console.log('dataMart:', dataMart)
-    return dataMart
-  }
-
-  function getCampaignType(data) {
-    return data.campaign_name.includes('預熱')
-      ? '預熱'
-      : data.campaign_name.includes('前測')
-      ? '前測'
-      : data.campaign_name.includes('嘖嘖')
-      ? '嘖嘖'
-      : 'none'
-  }
 }
 
 export default AdAccount
