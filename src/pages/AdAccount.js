@@ -154,8 +154,8 @@ function AdAccount({ adAccountId }) {
         ? '預熱'
         : data.campaign_name.includes('前測')
         ? '前測'
-        : data.campaign_name.includes('嘖嘖')
-        ? '嘖嘖'
+        : data.campaign_name.includes('上線')
+        ? '上線'
         : 'none'
     }
   }, [adAccountId, setAdAccount])
@@ -227,8 +227,8 @@ function AdAccount({ adAccountId }) {
           leadArray.push(null)
         }
 
-        if (dateData['嘖嘖']) {
-          const adCampaignArray = dateData['嘖嘖']
+        if (dateData['上線']) {
+          const adCampaignArray = dateData['上線']
           let totalSpend = 0
           let totalRevenue = 0
 

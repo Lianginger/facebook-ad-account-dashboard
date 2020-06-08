@@ -118,7 +118,7 @@ function Home() {
                   navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
                 }
               >
-                <h5 class='card-title'>{name}</h5>
+                <h5 className='card-title'>{name}</h5>
                 {adAccountLive ? (
                   <p className='text-success'>ACTIVE</p>
                 ) : (
