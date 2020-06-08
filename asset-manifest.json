@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/facebook-ad-account-dashboard/static/css/main.96288a09.chunk.css",
-    "main.js": "/facebook-ad-account-dashboard/static/js/main.e9d020f4.chunk.js",
-    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.e9d020f4.chunk.js.map",
+    "main.js": "/facebook-ad-account-dashboard/static/js/main.b88a87ae.chunk.js",
+    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.b88a87ae.chunk.js.map",
     "runtime-main.js": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js",
     "runtime-main.js.map": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js.map",
     "static/css/2.69121389.chunk.css": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css",
     "static/js/2.3c6248fb.chunk.js": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js",
     "static/js/2.3c6248fb.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js.map",
     "index.html": "/facebook-ad-account-dashboard/index.html",
-    "precache-manifest.7f8d4c6a8ccbe846840e38383b4c9c6b.js": "/facebook-ad-account-dashboard/precache-manifest.7f8d4c6a8ccbe846840e38383b4c9c6b.js",
+    "precache-manifest.5735410d3776ca00627ab1c1144457ca.js": "/facebook-ad-account-dashboard/precache-manifest.5735410d3776ca00627ab1c1144457ca.js",
     "service-worker.js": "/facebook-ad-account-dashboard/service-worker.js",
     "static/css/2.69121389.chunk.css.map": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css.map",
     "static/css/main.96288a09.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.96288a09.chunk.css.map",
@@ -20,6 +20,6 @@
     "static/css/2.69121389.chunk.css",
     "static/js/2.3c6248fb.chunk.js",
     "static/css/main.96288a09.chunk.css",
-    "static/js/main.e9d020f4.chunk.js"
+    "static/js/main.b88a87ae.chunk.js"
   ]
 }
