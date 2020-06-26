@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a8e31b8d4956b0f591da07fa7e317064",
+    "revision": "02edae4b9fc6a25629e36166a9b26fbb",
     "url": "/facebook-ad-account-dashboard/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css"
   },
   {
-    "revision": "0cbd056c1a6f2e2222e9",
+    "revision": "bd756acf1319f195881c",
     "url": "/facebook-ad-account-dashboard/static/css/main.96288a09.chunk.css"
   },
   {
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/facebook-ad-account-dashboard/static/js/2.3c6248fb.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "0cbd056c1a6f2e2222e9",
-    "url": "/facebook-ad-account-dashboard/static/js/main.b88a87ae.chunk.js"
+    "revision": "bd756acf1319f195881c",
+    "url": "/facebook-ad-account-dashboard/static/js/main.be094cb1.chunk.js"
   },
   {
     "revision": "b58938b7ce639180c509",
