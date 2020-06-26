@@ -207,7 +207,8 @@ function AdAccount({ adAccountId }) {
             const adCampaignSpend = parseInt(adCampaign.spend)
             const adCampaignLeadAction = adCampaign.actions.find(
               (action) =>
-                action.action_type === 'offsite_conversion.fb_pixel_custom'
+                action.action_type === 'offsite_conversion.fb_pixel_custom' ||
+                action.action_type === 'lead'
             )
 
             totalSpend += adCampaignSpend
@@ -259,6 +260,8 @@ function AdAccount({ adAccountId }) {
           adsDirectRoasArray.push(null)
         }
       })
+
+      // console.log(adAccount.data, leadSpendArray, leadArray)
 
       setAdAccount((state) => {
         state.dateArray = dateArray
