@@ -7,6 +7,13 @@ import './Home.css'
 function Home() {
   const [adAccounts, setAdAccounts] = useState([])
   const [user, setUser] = useState({})
+  let filteredAdAccounts = adAccounts.filter(
+    (adAccount) => adAccount.adAccountLive
+  )
+  filteredAdAccounts = filteredAdAccounts.sort(
+    (a, b) => b.campaignStatus.value - a.campaignStatus.value
+  )
+  console.log('filteredAdAccounts', filteredAdAccounts)
 
   useEffect(() => {
     window.checkLoginState = function () {
@@ -103,33 +110,44 @@ function Home() {
       </div>
 
       {/* 廣告帳戶列表 */}
-
-      {adAccounts.length > 0 ? (
+      {filteredAdAccounts.length > 0 ? (
         <main className='d-flex flex-wrap justify-content-center'>
-          {adAccounts.map(({ name, id, adAccountLive, amount_spent }) => (
-            <div
-              key={id}
-              class='card m-1 ad-account-card'
-              style={{ width: '18rem' }}
-            >
+          {filteredAdAccounts.map(
+            ({ name, id, campaignStatus, amount_spent }) => (
               <div
-                class='card-body'
-                onClick={() =>
-                  navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
-                }
+                key={id}
+                className='card m-1 ad-account-card'
+                style={{ width: '18rem' }}
               >
-                <h5 className='card-title'>{name}</h5>
-                {adAccountLive ? (
-                  <p className='text-success'>ACTIVE</p>
-                ) : (
-                  <p className='text-secondary'>PAUSED</p>
-                )}
-                <p class='card-text'>
-                  總廣告花費：{format(amount_spent).toDollar()}
-                </p>
+                <div
+                  className='card-body'
+                  onClick={() =>
+                    navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
+                  }
+                >
+                  <span
+                    className={
+                      'badge badge-' +
+                      (campaignStatus.value === 3
+                        ? 'success'
+                        : campaignStatus.value === 2
+                        ? 'primary'
+                        : campaignStatus.value === 1
+                        ? 'secondary'
+                        : '')
+                    }
+                  >
+                    {campaignStatus.name}
+                  </span>
+
+                  <h5 className='card-title'>{name}</h5>
+                  <p className='card-text'>
+                    總廣告花費：{format(amount_spent).toDollar()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </main>
       ) : (
         ''
@@ -150,19 +168,22 @@ function Home() {
         let sortedAdAccountsData = res.adaccounts.data.sort(
           (a, b) => a.age - b.age
         )
+        console.log(sortedAdAccountsData)
         // 遍歷廣告活動狀態，在廣告帳戶物件加上 adAccountLive flag
         sortedAdAccountsData = sortedAdAccountsData.map((adAccount) => {
           adAccount.adAccountLive = false
-          if (adAccount.campaigns) {
-            const activeAdCampaign = adAccount.campaigns.data.find(
-              (adCampaign) => {
-                return adCampaign.status === 'ACTIVE'
-              }
-            )
+          adAccount.campaignStatus = { name: '', value: 0 }
 
-            if (activeAdCampaign) {
-              adAccount.adAccountLive = true
-            }
+          if (adAccount.campaigns) {
+            adAccount.campaigns.data.forEach((adCampaign) => {
+              if (adCampaign.status === 'ACTIVE') {
+                adAccount.adAccountLive = true
+              }
+              adAccount.campaignStatus = handleAdCampaignStatus(
+                adAccount.campaignStatus,
+                adCampaign.name
+              )
+            })
           }
 
           return adAccount
@@ -170,6 +191,23 @@ function Home() {
         setAdAccounts((state) => [...sortedAdAccountsData])
       }
     )
+  }
+
+  function handleAdCampaignStatus(originalStatus, adCampaignName) {
+    // 狀態變成數字來比大小
+    // 較大的為現在的狀態
+    const newStatus = getAdCampaignStatus(adCampaignName)
+    return newStatus.value > originalStatus.value ? newStatus : originalStatus
+  }
+
+  function getAdCampaignStatus(adCampaignName) {
+    return adCampaignName.includes('上線')
+      ? { name: '上線', value: 3 }
+      : adCampaignName.includes('預熱')
+      ? { name: '預熱', value: 2 }
+      : adCampaignName.includes('前測')
+      ? { name: '前測', value: 1 }
+      : { name: '', value: 0 }
   }
 }
 
