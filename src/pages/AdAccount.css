@@ -1,0 +1,14 @@
+.tableFixHead {
+  overflow-y: auto;
+  height: 80vh;
+}
+.tableFixHead thead th {
+  position: sticky;
+  top: 0;
+  background-color: #dee2e6;
+}
+
+.table td,
+.table th {
+  white-space: nowrap;
+}

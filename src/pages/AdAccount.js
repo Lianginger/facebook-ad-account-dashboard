@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useImmer } from 'use-immer'
 import { Line } from 'react-chartjs-2'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { navigate } from '@reach/router'
 import { format } from './utils'
 
@@ -60,6 +61,13 @@ function AdAccount({ adAccountId }) {
           },
         },
       ],
+    },
+    plugins: {
+      datalabels: {
+        color: 'black',
+        align: 'top',
+        offset: 8,
+      },
     },
   }
 
@@ -407,7 +415,17 @@ function AdAccount({ adAccountId }) {
                 </div>
               </div>
               <div className='col-12 col-md-6 p-3'>
-                <p>{project.name}</p>
+                <p>
+                  {/* TODO: 串接其他平台 */}
+                  <a
+                    href={
+                      'https://www.zeczec.com/projects/' + adAccount.projectId
+                    }
+                    target='blank'
+                  >
+                    {project.name}
+                  </a>
+                </p>
                 <h3>{project.funding_current}</h3>
                 <hr />
                 <p>
@@ -441,44 +459,46 @@ function AdAccount({ adAccountId }) {
 
           {/* 走速表 */}
           <div className='table-responsive'>
-            <table className='table'>
-              <thead>
-                <tr>
-                  <th scope='col'>Date</th>
-                  <th scope='col'>前測花費</th>
-                  <th scope='col'>CPL</th>
-                  <th scope='col'>預熱花費</th>
-                  <th scope='col'>上線花費</th>
-                  <th scope='col'>廣告直接 ROAS</th>
-                  <th scope='col'>總體 ROAS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {adAccount.dateArray.map((date, index) => {
-                  return (
-                    <tr key={`daily-adAccount-data-${index}`}>
-                      <th>{date}</th>
-                      <td>
-                        {format(adAccount.leadSpendArray[index]).toDollar()}
-                      </td>
-                      <td>{format(adAccount.leadArray[index]).toDollar()}</td>
-                      <td>
-                        {format(
-                          adAccount.preLaunchSpendArray[index]
-                        ).toDollar()}
-                      </td>
-                      <td>
-                        {format(
-                          adAccount.fundRaisingSpendArray[index]
-                        ).toDollar()}
-                      </td>
-                      <td>{adAccount.adsDirectRoasArray[index]}</td>
-                      <td>{adAccount.totalRoasArray[index]}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            <div className='tableFixHead'>
+              <table className='table'>
+                <thead>
+                  <tr>
+                    <th scope='col'>Date</th>
+                    <th scope='col'>前測花費</th>
+                    <th scope='col'>CPL</th>
+                    <th scope='col'>預熱花費</th>
+                    <th scope='col'>上線花費</th>
+                    <th scope='col'>廣告直接 ROAS</th>
+                    <th scope='col'>總體 ROAS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adAccount.dateArray.map((date, index) => {
+                    return (
+                      <tr key={`daily-adAccount-data-${index}`}>
+                        <th>{date}</th>
+                        <td>
+                          {format(adAccount.leadSpendArray[index]).toDollar()}
+                        </td>
+                        <td>{format(adAccount.leadArray[index]).toDollar()}</td>
+                        <td>
+                          {format(
+                            adAccount.preLaunchSpendArray[index]
+                          ).toDollar()}
+                        </td>
+                        <td>
+                          {format(
+                            adAccount.fundRaisingSpendArray[index]
+                          ).toDollar()}
+                        </td>
+                        <td>{adAccount.adsDirectRoasArray[index]}</td>
+                        <td>{adAccount.totalRoasArray[index]}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}

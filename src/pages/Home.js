@@ -4,16 +4,19 @@ import { format } from './utils'
 
 import './Home.css'
 
+import Switch from '../components/Switch'
+
 function Home() {
   const [adAccounts, setAdAccounts] = useState([])
   const [user, setUser] = useState({})
-  let filteredAdAccounts = adAccounts.filter(
-    (adAccount) => adAccount.adAccountLive
-  )
+  const [isFilter, setIsFilter] = useState(true)
+
+  let filteredAdAccounts = isFilter
+    ? adAccounts.filter((adAccount) => adAccount.adAccountLive)
+    : adAccounts
   filteredAdAccounts = filteredAdAccounts.sort(
     (a, b) => b.campaignStatus.value - a.campaignStatus.value
   )
-  console.log('filteredAdAccounts', filteredAdAccounts)
 
   useEffect(() => {
     window.checkLoginState = function () {
@@ -111,44 +114,57 @@ function Home() {
 
       {/* 廣告帳戶列表 */}
       {filteredAdAccounts.length > 0 ? (
-        <main className='d-flex flex-wrap justify-content-center'>
-          {filteredAdAccounts.map(
-            ({ name, id, campaignStatus, amount_spent }) => (
-              <div
-                key={id}
-                className='card m-1 ad-account-card'
-                style={{ width: '18rem' }}
-              >
+        <>
+          <div className='d-flex align-items-center justify-content-center my-2'>
+            <Switch
+              labelFor={'isFilter'}
+              isOn={isFilter}
+              handleToggle={() => setIsFilter(!isFilter)}
+              onColor='#e43f5a'
+            />
+            <span>只顯示 Active 廣告帳戶</span>
+          </div>
+          <main className='d-flex flex-wrap justify-content-center'>
+            {filteredAdAccounts.map(
+              ({ name, id, adAccountLive, campaignStatus, amount_spent }) => (
                 <div
-                  className='card-body'
-                  onClick={() =>
-                    navigate(`/facebook-ad-account-dashboard/ad-account/${id}`)
-                  }
+                  key={id}
+                  className='card m-1 ad-account-card'
+                  style={{ width: '18rem', opacity: !adAccountLive && 0.3 }}
                 >
-                  <span
-                    className={
-                      'badge badge-' +
-                      (campaignStatus.value === 3
-                        ? 'success'
-                        : campaignStatus.value === 2
-                        ? 'primary'
-                        : campaignStatus.value === 1
-                        ? 'secondary'
-                        : '')
+                  <div
+                    className='card-body'
+                    onClick={() =>
+                      navigate(
+                        `/facebook-ad-account-dashboard/ad-account/${id}`
+                      )
                     }
                   >
-                    {campaignStatus.name}
-                  </span>
+                    <span
+                      className={
+                        'badge badge-' +
+                        (campaignStatus.value === 3
+                          ? 'success'
+                          : campaignStatus.value === 2
+                          ? 'primary'
+                          : campaignStatus.value === 1
+                          ? 'secondary'
+                          : '')
+                      }
+                    >
+                      {campaignStatus.name}
+                    </span>
 
-                  <h5 className='card-title'>{name}</h5>
-                  <p className='card-text'>
-                    總廣告花費：{format(amount_spent).toDollar()}
-                  </p>
+                    <h5 className='card-title'>{name}</h5>
+                    <p className='card-text'>
+                      總廣告花費：{format(amount_spent).toDollar()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )
-          )}
-        </main>
+              )
+            )}
+          </main>
+        </>
       ) : (
         ''
       )}
