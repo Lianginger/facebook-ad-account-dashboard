@@ -24,7 +24,6 @@ function AdAccount({ adAccountId }) {
   const [project, setProject] = useImmer({
     dailyFundingDiff: undefined,
   })
-  const [paging, setPaging] = useState({})
 
   const chartConfigOptions = {
     maintainAspectRatio: false,
@@ -116,11 +115,11 @@ function AdAccount({ adAccountId }) {
         })
     }
 
-    function fetchAdAccountInsights(cursorKey = '', cursorValue = '') {
+    function fetchAdAccountInsights() {
       setLoading(true)
       fetch(
-        // `http://localhost:8000/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
-        `https://fb-ads-api.herokuapp.com/ad-account/insights/${adAccountId}?${cursorKey}=${cursorValue}`
+        // `http://localhost:8000/ad-account/insights/${adAccountId}`
+        `https://fb-ads-api.herokuapp.com/ad-account/insights/${adAccountId}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -128,7 +127,6 @@ function AdAccount({ adAccountId }) {
           setAdAccount((state) => {
             state.data = formatDataMart(res.data)
           })
-          setPaging(res.paging)
           setLoading(false)
         })
     }
@@ -442,69 +440,46 @@ function AdAccount({ adAccountId }) {
           </div>
 
           {/* 走速表 */}
-          <table className='table'>
-            <thead>
-              <tr>
-                <th scope='col'>Date</th>
-                <th scope='col'>前測花費</th>
-                <th scope='col'>CPL</th>
-                <th scope='col'>預熱花費</th>
-                <th scope='col'>上線花費</th>
-                <th scope='col'>廣告直接 ROAS</th>
-                <th scope='col'>總體 ROAS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {adAccount.dateArray.map((date, index) => {
-                return (
-                  <tr key={`daily-adAccount-data-${index}`}>
-                    <th>{date}</th>
-                    <td>
-                      {format(adAccount.leadSpendArray[index]).toDollar()}
-                    </td>
-                    <td>{format(adAccount.leadArray[index]).toDollar()}</td>
-                    <td>
-                      {format(adAccount.preLaunchSpendArray[index]).toDollar()}
-                    </td>
-                    <td>
-                      {format(
-                        adAccount.fundRaisingSpendArray[index]
-                      ).toDollar()}
-                    </td>
-                    <td>{adAccount.adsDirectRoasArray[index]}</td>
-                    <td>{adAccount.totalRoasArray[index]}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-          {/* Paging */}
-          {/* <div className='row'>
-            <div className='col-6 text-left'>
-              {paging.hasPrevious ? (
-                <div
-                  className='btn btn-primary'
-                  onClick={() => fetchData('before', paging.cursors.before)}
-                >
-                  Previous
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
-            <div className='col-6 text-right'>
-              {paging.hasNext ? (
-                <div
-                  className='btn btn-primary'
-                  onClick={() => fetchData('after', paging.cursors.after)}
-                >
-                  Next
-                </div>
-              ) : (
-                ''
-              )}
-            </div>
-          </div> */}
+          <div className='table-responsive'>
+            <table className='table'>
+              <thead>
+                <tr>
+                  <th scope='col'>Date</th>
+                  <th scope='col'>前測花費</th>
+                  <th scope='col'>CPL</th>
+                  <th scope='col'>預熱花費</th>
+                  <th scope='col'>上線花費</th>
+                  <th scope='col'>廣告直接 ROAS</th>
+                  <th scope='col'>總體 ROAS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adAccount.dateArray.map((date, index) => {
+                  return (
+                    <tr key={`daily-adAccount-data-${index}`}>
+                      <th>{date}</th>
+                      <td>
+                        {format(adAccount.leadSpendArray[index]).toDollar()}
+                      </td>
+                      <td>{format(adAccount.leadArray[index]).toDollar()}</td>
+                      <td>
+                        {format(
+                          adAccount.preLaunchSpendArray[index]
+                        ).toDollar()}
+                      </td>
+                      <td>
+                        {format(
+                          adAccount.fundRaisingSpendArray[index]
+                        ).toDollar()}
+                      </td>
+                      <td>{adAccount.adsDirectRoasArray[index]}</td>
+                      <td>{adAccount.totalRoasArray[index]}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         </>
       )}
     </div>
