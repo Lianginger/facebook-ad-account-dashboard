@@ -20,10 +20,13 @@ function AdAccount({ adAccountId }) {
     preLaunchSpendArray: [],
     fundRaisingSpendArray: [],
     adsDirectRoasArray: [],
+    dailyOrderCount:[],
+    dailyFunding:[],
     totalRoasArray: [],
   })
   const [project, setProject] = useImmer({
     dailyFundingDiff: undefined,
+    dailyOrderDiff: undefined
   })
 
   const chartConfigOptions = {
@@ -332,15 +335,21 @@ function AdAccount({ adAccountId }) {
     })
 
     const dailyFundingDiff = {}
+    const dailyOrderDiff = {}
     let fundingOfThePreviousDay = 0
+    let orderOfThePreviousDay = 0
     for (let [date, fundingData] of Object.entries(timelineDataMart)) {
       const fundingToday = fundingData[fundingData.length - 1][2]
+      const orderToday = fundingData[fundingData.length - 1][1]
       dailyFundingDiff[date] = fundingToday - fundingOfThePreviousDay
+      dailyOrderDiff[date] = orderToday -orderOfThePreviousDay
       fundingOfThePreviousDay = fundingToday
+      orderOfThePreviousDay = orderToday
     }
 
     setProject((state) => {
       state.dailyFundingDiff = dailyFundingDiff
+      state.dailyOrderDiff = dailyOrderDiff
     })
   }, [project.timeline, project.started_at, project.finished_at, setProject])
 
@@ -349,12 +358,17 @@ function AdAccount({ adAccountId }) {
       project.dailyFundingDiff &&
       adAccount.fundRaisingSpendArray.length > 0
     ) {
+      const dailyOrderCount = []
+      const dailyFunding = []
       const totalRoasArray = []
       adAccount.dateArray.forEach((date, index) => {
         if (
           project.dailyFundingDiff[date] &&
+          project.dailyOrderDiff[date] &&
           adAccount.fundRaisingSpendArray[index]
         ) {
+          dailyOrderCount.push(project.dailyOrderDiff[date])
+          dailyFunding.push(project.dailyFundingDiff[date])
           totalRoasArray.push(
             (
               project.dailyFundingDiff[date] /
@@ -362,15 +376,20 @@ function AdAccount({ adAccountId }) {
             ).toFixed(1)
           )
         } else {
+          dailyOrderCount.push(null)
+          dailyFunding.push(null)
           totalRoasArray.push(null)
         }
       })
       setAdAccount((state) => {
+        state.dailyOrderCount = dailyOrderCount
+        state.dailyFunding = dailyFunding
         state.totalRoasArray = totalRoasArray
       })
     }
   }, [
     project.dailyFundingDiff,
+    project.dailyOrderDiff,
     adAccount.fundRaisingSpendArray,
     adAccount.dateArray,
     setAdAccount,
@@ -469,6 +488,8 @@ function AdAccount({ adAccountId }) {
                     <th scope='col'>預熱花費</th>
                     <th scope='col'>上線花費</th>
                     <th scope='col'>廣告直接 ROAS</th>
+                    <th scope='col'>每日訂單數</th>
+                    <th scope='col'>每日集資金額</th>
                     <th scope='col'>總體 ROAS</th>
                   </tr>
                 </thead>
@@ -492,6 +513,8 @@ function AdAccount({ adAccountId }) {
                           ).toDollar()}
                         </td>
                         <td>{adAccount.adsDirectRoasArray[index]}</td>
+                        <td>{adAccount.dailyOrderCount[index]}</td>
+                        <td>{format(adAccount.dailyFunding[index]).toDollar()}</td>
                         <td>{adAccount.totalRoasArray[index]}</td>
                       </tr>
                     )
