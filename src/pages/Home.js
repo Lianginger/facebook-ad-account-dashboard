@@ -17,6 +17,13 @@ function Home() {
   filteredAdAccounts = filteredAdAccounts.sort(
     (a, b) => b.campaignStatus.value - a.campaignStatus.value
   )
+  useEffect(() => {
+    const params = new URL(document.location).searchParams
+    const path = params.get('p')
+    if (path) {
+      navigate(`/facebook-ad-account-dashboard${path}`)
+    }
+  }, [])
 
   useEffect(() => {
     window.checkLoginState = function () {

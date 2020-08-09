@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { useImmer } from 'use-immer'
 import { Line } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import { navigate } from '@reach/router'
 import { format } from './utils'
+
+import { Header } from '../containers'
 
 import './AdAccount.css'
 
@@ -15,18 +16,32 @@ function AdAccount({ adAccountId }) {
     projectId: '',
     data: [],
     dateArray: [],
-    leadSpendArray: [],
-    leadArray: [],
-    preLaunchSpendArray: [],
-    fundRaisingSpendArray: [],
-    adsDirectRoasArray: [],
-    dailyOrderCount:[],
-    dailyFunding:[],
-    totalRoasArray: [],
+
+    leadSpendTotal: 0,
+    leadSpendDaily: [],
+    leadTotal: 0,
+    leadDaily: [],
+    costPerLeadDaily: [],
+
+    preLaunchSpendTotal: 0,
+    preLaunchSpendDaily: [],
+
+    fundRaisingSpendTotal: 0,
+    fundRaisingSpendDaily: [],
+    adsDirectFundRaisingTotal: 0,
+    adsDirectFundRaisingDaily: [],
+    adsDirectRoasDaily: [],
+
+    fundRaisingTotal: 0,
+    fundRaisingDaily: [],
+    orderCountTotal: 0,
+    orderCountDaily: [],
+    totalRoasDaily: [],
   })
   const [project, setProject] = useImmer({
-    dailyFundingDiff: undefined,
-    dailyOrderDiff: undefined
+    started_at: undefined,
+    fundRaisingDateMap: undefined,
+    orderCountDateMap: undefined,
   })
 
   const chartConfigOptions = {
@@ -74,7 +89,7 @@ function AdAccount({ adAccountId }) {
     },
   }
 
-  const lineChartData = {
+  const leadLineChartData = {
     labels: [...adAccount.dateArray].reverse(),
     datasets: [
       {
@@ -83,30 +98,28 @@ function AdAccount({ adAccountId }) {
         borderColor: '#1f4068',
         pointBackgroundColor: '#1f4068',
         pointHoverBackgroundColor: '#1f4068',
-        data: [...adAccount.leadArray].reverse(),
+        data: [...adAccount.costPerLeadDaily].reverse(),
         yAxisID: 'y-axis-1',
       },
-      // {
-      //   label: '廣告直接 ROAS',
-      //   fill: false,
-      //   borderColor: '#1b1b2f',
-      //   pointBackgroundColor: '#1b1b2f',
-      //   pointHoverBackgroundColor: '#1b1b2f',
-      //   data: [...adAccount.adsDirectRoasArray].reverse(),
-      //   yAxisID: 'y-axis-2',
-      // },
+    ],
+  }
+
+  const fundRaisingLineChartData = {
+    labels: [...adAccount.dateArray].reverse(),
+    datasets: [
       {
         label: '總體 ROAS',
         fill: false,
         borderColor: '#e43f5a',
         pointBackgroundColor: '#e43f5a',
         pointHoverBackgroundColor: '#e43f5a',
-        data: [...adAccount.totalRoasArray].reverse(),
+        data: [...adAccount.totalRoasDaily].reverse(),
         yAxisID: 'y-axis-2',
       },
     ],
   }
 
+  // 取得廣告帳號資料、廣告數據資料
   useEffect(() => {
     fetchAdAccountInfo()
     fetchAdAccountInsights()
@@ -169,16 +182,27 @@ function AdAccount({ adAccountId }) {
     }
   }, [adAccountId, setAdAccount])
 
+  // 處理廣告數據資料
   useEffect(() => {
     generateChartData()
 
     function generateChartData() {
       let dateArray = Object.keys(adAccount.data)
-      let leadSpendArray = []
-      let leadArray = []
-      let preLaunchSpendArray = []
-      let fundRaisingSpendArray = []
-      let adsDirectRoasArray = []
+
+      let leadSpendTotal = 0
+      let leadSpendDaily = []
+      let leadTotal = 0
+      let leadDaily = []
+      let costPerLeadDaily = []
+
+      let preLaunchSpendTotal = 0
+      let preLaunchSpendDaily = []
+
+      let fundRaisingSpendTotal = 0
+      let fundRaisingSpendDaily = []
+      let adsDirectFundRaisingTotal = 0
+      let adsDirectFundRaisingDaily = []
+      let adsDirectRoasDaily = []
 
       Object.values(adAccount.data).forEach((dateData) => {
         if (dateData['預熱']) {
@@ -195,12 +219,13 @@ function AdAccount({ adAccountId }) {
             totalSpend += adCampaignSpend
           })
           if (totalSpend !== 0) {
-            preLaunchSpendArray.push(totalSpend)
+            preLaunchSpendTotal += totalSpend
+            preLaunchSpendDaily.push(totalSpend)
           } else {
-            preLaunchSpendArray.push(null)
+            preLaunchSpendDaily.push(null)
           }
         } else {
-          preLaunchSpendArray.push(null)
+          preLaunchSpendDaily.push(null)
         }
 
         if (dateData['前測']) {
@@ -226,15 +251,21 @@ function AdAccount({ adAccountId }) {
               : 0
           })
           if (totalSpend !== 0 && totalLead !== 0) {
-            leadSpendArray.push(totalSpend)
-            leadArray.push((totalSpend / totalLead).toFixed(1))
+            leadSpendTotal += totalSpend
+            leadSpendDaily.push(totalSpend)
+
+            leadTotal += totalLead
+            leadDaily.push(totalLead)
+            costPerLeadDaily.push((totalSpend / totalLead).toFixed(1))
           } else {
-            leadSpendArray.push(null)
-            leadArray.push(null)
+            leadSpendDaily.push(null)
+            leadDaily.push(null)
+            costPerLeadDaily.push(null)
           }
         } else {
-          leadSpendArray.push(null)
-          leadArray.push(null)
+          leadSpendDaily.push(null)
+          leadDaily.push(null)
+          costPerLeadDaily.push(null)
         }
 
         if (dateData['上線']) {
@@ -258,31 +289,47 @@ function AdAccount({ adAccountId }) {
           })
 
           if (totalSpend !== 0 && totalRevenue !== 0) {
-            fundRaisingSpendArray.push(totalSpend)
-            adsDirectRoasArray.push((totalRevenue / totalSpend).toFixed(1))
+            fundRaisingSpendTotal += totalSpend
+            fundRaisingSpendDaily.push(totalSpend)
+            adsDirectFundRaisingTotal += totalRevenue
+            adsDirectFundRaisingDaily.push(totalRevenue)
+            adsDirectRoasDaily.push((totalRevenue / totalSpend).toFixed(1))
           } else {
-            fundRaisingSpendArray.push(null)
-            adsDirectRoasArray.push(null)
+            fundRaisingSpendDaily.push(null)
+            adsDirectFundRaisingDaily.push(null)
+            adsDirectRoasDaily.push(null)
           }
         } else {
-          fundRaisingSpendArray.push(null)
-          adsDirectRoasArray.push(null)
+          fundRaisingSpendDaily.push(null)
+          adsDirectFundRaisingDaily.push(null)
+          adsDirectRoasDaily.push(null)
         }
       })
 
-      // console.log(adAccount.data, leadSpendArray, leadArray)
+      // console.log(adAccount.data, leadSpendDaily, costPerLeadDaily)
 
       setAdAccount((state) => {
         state.dateArray = dateArray
-        state.leadSpendArray = leadSpendArray
-        state.leadArray = leadArray
-        state.preLaunchSpendArray = preLaunchSpendArray
-        state.fundRaisingSpendArray = fundRaisingSpendArray
-        state.adsDirectRoasArray = adsDirectRoasArray
+
+        state.leadSpendTotal = leadSpendTotal
+        state.leadSpendDaily = leadSpendDaily
+        state.leadTotal = leadTotal
+        state.leadDaily = leadDaily
+        state.costPerLeadDaily = costPerLeadDaily
+
+        state.preLaunchSpendTotal = preLaunchSpendTotal
+        state.preLaunchSpendDaily = preLaunchSpendDaily
+
+        state.fundRaisingSpendTotal = fundRaisingSpendTotal
+        state.fundRaisingSpendDaily = fundRaisingSpendDaily
+        state.adsDirectFundRaisingTotal = adsDirectFundRaisingTotal
+        state.adsDirectFundRaisingDaily = adsDirectFundRaisingDaily
+        state.adsDirectRoasDaily = adsDirectRoasDaily
       })
     }
   }, [adAccount.data, setAdAccount])
 
+  // 取得嘖嘖集資資料
   useEffect(() => {
     const platformId = adAccount.platformId
     const projectId = adAccount.projectId
@@ -310,6 +357,7 @@ function AdAccount({ adAccountId }) {
     }
   }, [adAccount.platformId, adAccount.projectId, setProject])
 
+  // 處理嘖嘖集資資料
   useEffect(() => {
     if (!project.timeline) return
 
@@ -334,69 +382,78 @@ function AdAccount({ adAccountId }) {
         : (timelineDataMart[date] = [fundingData])
     })
 
-    const dailyFundingDiff = {}
-    const dailyOrderDiff = {}
+    const fundRaisingDateMap = {}
+    const orderCountDateMap = {}
     let fundingOfThePreviousDay = 0
     let orderOfThePreviousDay = 0
     for (let [date, fundingData] of Object.entries(timelineDataMart)) {
       const fundingToday = fundingData[fundingData.length - 1][2]
       const orderToday = fundingData[fundingData.length - 1][1]
-      dailyFundingDiff[date] = fundingToday - fundingOfThePreviousDay
-      dailyOrderDiff[date] = orderToday -orderOfThePreviousDay
+      fundRaisingDateMap[date] = fundingToday - fundingOfThePreviousDay
+      orderCountDateMap[date] = orderToday - orderOfThePreviousDay
       fundingOfThePreviousDay = fundingToday
       orderOfThePreviousDay = orderToday
     }
 
     setProject((state) => {
-      state.dailyFundingDiff = dailyFundingDiff
-      state.dailyOrderDiff = dailyOrderDiff
+      state.fundRaisingDateMap = fundRaisingDateMap
+      state.orderCountDateMap = orderCountDateMap
     })
   }, [project.timeline, project.started_at, project.finished_at, setProject])
 
+  // 嘖嘖集資資料 => 廣數數據資料
   useEffect(() => {
     if (
-      project.dailyFundingDiff &&
-      adAccount.fundRaisingSpendArray.length > 0
+      project.fundRaisingDateMap &&
+      adAccount.fundRaisingSpendDaily.length > 0
     ) {
-      const dailyOrderCount = []
-      const dailyFunding = []
-      const totalRoasArray = []
+      let fundRaisingTotal = 0
+      const fundRaisingDaily = []
+      let orderCountTotal = 0
+      const orderCountDaily = []
+
+      const totalRoasDaily = []
       adAccount.dateArray.forEach((date, index) => {
         if (
-          project.dailyFundingDiff[date] &&
-          project.dailyOrderDiff[date] &&
-          adAccount.fundRaisingSpendArray[index]
+          project.fundRaisingDateMap[date] &&
+          project.orderCountDateMap[date] &&
+          adAccount.fundRaisingSpendDaily[index]
         ) {
-          dailyOrderCount.push(project.dailyOrderDiff[date])
-          dailyFunding.push(project.dailyFundingDiff[date])
-          totalRoasArray.push(
+          fundRaisingTotal += project.fundRaisingDateMap[date]
+          fundRaisingDaily.push(project.fundRaisingDateMap[date])
+          orderCountTotal += project.orderCountDateMap[date]
+          orderCountDaily.push(project.orderCountDateMap[date])
+          totalRoasDaily.push(
             (
-              project.dailyFundingDiff[date] /
-              adAccount.fundRaisingSpendArray[index]
+              project.fundRaisingDateMap[date] /
+              adAccount.fundRaisingSpendDaily[index]
             ).toFixed(1)
           )
         } else {
-          dailyOrderCount.push(null)
-          dailyFunding.push(null)
-          totalRoasArray.push(null)
+          orderCountDaily.push(null)
+          fundRaisingDaily.push(null)
+          totalRoasDaily.push(null)
         }
       })
       setAdAccount((state) => {
-        state.dailyOrderCount = dailyOrderCount
-        state.dailyFunding = dailyFunding
-        state.totalRoasArray = totalRoasArray
+        state.fundRaisingTotal = fundRaisingTotal
+        state.fundRaisingDaily = fundRaisingDaily
+        state.orderCountTotal = orderCountTotal
+        state.orderCountDaily = orderCountDaily
+        state.totalRoasDaily = totalRoasDaily
       })
     }
   }, [
-    project.dailyFundingDiff,
-    project.dailyOrderDiff,
-    adAccount.fundRaisingSpendArray,
+    project.fundRaisingDateMap,
+    project.orderCountDateMap,
+    adAccount.fundRaisingSpendDaily,
     adAccount.dateArray,
     setAdAccount,
   ])
 
   return (
     <div className='container my-3'>
+      <Header />
       {loading ? (
         <div className='text-center my-5'>
           <div className='spinner-border text-primary' role='status'>
@@ -405,12 +462,6 @@ function AdAccount({ adAccountId }) {
         </div>
       ) : (
         <>
-          <div
-            className='btn btn-primary'
-            onClick={() => navigate('/facebook-ad-account-dashboard/')}
-          >
-            Home
-          </div>
           <h1 className='text-center my-3'>{adAccount.name}</h1>
 
           {/* 集資資料 */}
@@ -473,7 +524,13 @@ function AdAccount({ adAccountId }) {
 
           {/* 圖表 */}
           <div className='my-5' style={{ height: '300px' }}>
-            <Line data={lineChartData} options={chartConfigOptions} />
+            <Line data={leadLineChartData} options={chartConfigOptions} />
+          </div>
+          <div className='my-5' style={{ height: '300px' }}>
+            <Line
+              data={fundRaisingLineChartData}
+              options={chartConfigOptions}
+            />
           </div>
 
           {/* 走速表 */}
@@ -484,13 +541,46 @@ function AdAccount({ adAccountId }) {
                   <tr>
                     <th scope='col'>Date</th>
                     <th scope='col'>前測花費</th>
+                    <th scope='col'>名單數</th>
                     <th scope='col'>CPL</th>
                     <th scope='col'>預熱花費</th>
                     <th scope='col'>上線花費</th>
+                    <th scope='col'>廣告直接轉換金額</th>
                     <th scope='col'>廣告直接 ROAS</th>
                     <th scope='col'>每日訂單數</th>
                     <th scope='col'>每日集資金額</th>
                     <th scope='col'>總體 ROAS</th>
+                  </tr>
+                  <tr>
+                    <td>總計</td>
+                    <td>{format(adAccount.leadSpendTotal).toDollar()}</td>
+                    <td>{format(adAccount.leadTotal).toNumber()}</td>
+                    <td>
+                      {(adAccount.leadSpendTotal / adAccount.leadTotal).toFixed(
+                        1
+                      )}
+                    </td>
+                    <td>{format(adAccount.preLaunchSpendTotal).toDollar()}</td>
+                    <td>
+                      {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                    </td>
+                    <td>
+                      {format(adAccount.adsDirectFundRaisingTotal).toDollar()}
+                    </td>
+                    <td>
+                      {(
+                        adAccount.adsDirectFundRaisingTotal /
+                        adAccount.fundRaisingSpendTotal
+                      ).toFixed(1)}
+                    </td>
+                    <td>{format(adAccount.orderCountTotal).toNumber()}</td>
+                    <td>{format(adAccount.fundRaisingTotal).toDollar()}</td>
+                    <td>
+                      {(
+                        adAccount.fundRaisingTotal /
+                        adAccount.fundRaisingSpendTotal
+                      ).toFixed(1)}
+                    </td>
                   </tr>
                 </thead>
                 <tbody>
@@ -499,23 +589,33 @@ function AdAccount({ adAccountId }) {
                       <tr key={`daily-adAccount-data-${index}`}>
                         <th>{date}</th>
                         <td>
-                          {format(adAccount.leadSpendArray[index]).toDollar()}
+                          {format(adAccount.leadSpendDaily[index]).toDollar()}
                         </td>
-                        <td>{format(adAccount.leadArray[index]).toDollar()}</td>
+                        <td>{format(adAccount.leadDaily[index]).toNumber()}</td>
+                        <td>
+                          {format(adAccount.costPerLeadDaily[index]).toDollar()}
+                        </td>
                         <td>
                           {format(
-                            adAccount.preLaunchSpendArray[index]
+                            adAccount.preLaunchSpendDaily[index]
                           ).toDollar()}
                         </td>
                         <td>
                           {format(
-                            adAccount.fundRaisingSpendArray[index]
+                            adAccount.fundRaisingSpendDaily[index]
                           ).toDollar()}
                         </td>
-                        <td>{adAccount.adsDirectRoasArray[index]}</td>
-                        <td>{adAccount.dailyOrderCount[index]}</td>
-                        <td>{format(adAccount.dailyFunding[index]).toDollar()}</td>
-                        <td>{adAccount.totalRoasArray[index]}</td>
+                        <td>
+                          {format(
+                            adAccount.adsDirectFundRaisingDaily[index]
+                          ).toDollar()}
+                        </td>
+                        <td>{adAccount.adsDirectRoasDaily[index]}</td>
+                        <td>{adAccount.orderCountDaily[index]}</td>
+                        <td>
+                          {format(adAccount.fundRaisingDaily[index]).toDollar()}
+                        </td>
+                        <td>{adAccount.totalRoasDaily[index]}</td>
                       </tr>
                     )
                   })}

@@ -1,10 +1,18 @@
 .tableFixHead {
   overflow-y: auto;
   height: 80vh;
+  text-align: center;
 }
-.tableFixHead thead th {
+
+.tableFixHead thead tr th {
   position: sticky;
-  top: 0;
+  top: 0px;
+  background-color: #dee2e6;
+}
+
+.tableFixHead thead tr:nth-child(2) td {
+  position: sticky;
+  top: 48.3px;
   background-color: #dee2e6;
 }
 
