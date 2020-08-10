@@ -1,6 +1,9 @@
+@import '../styles/theme.scss';
+
 .header {
   display: flex;
   align-items: center;
+  margin-bottom: 25px;
 
   .header__line-left,
   .header__line-right {
@@ -30,6 +33,14 @@
         color: #8591a0;
       }
     }
+    .header__title {
+      position: absolute;
+      top: 23px;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 30px;
+      color: $main;
+    }
   }
 
   .header__line-right {
@@ -45,6 +56,10 @@
   }
 
   @media screen and (min-width: 768px) {
+    .header__line-left,
+    .header__line-right {
+      border: 1px solid #0a2240;
+    }
     .header__line-right {
       display: inline-block;
       flex: 1 1 auto;

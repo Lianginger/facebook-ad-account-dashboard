@@ -4,9 +4,9 @@ import { Line } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { format } from './utils'
 
-import { Header } from '../containers'
+import { HeaderContainer, ProjectContainer } from '../containers'
 
-import './AdAccount.css'
+import './AdAccount.scss'
 
 function AdAccount({ adAccountId }) {
   const [loading, setLoading] = useState(true)
@@ -453,7 +453,7 @@ function AdAccount({ adAccountId }) {
 
   return (
     <div className='container my-3'>
-      <Header />
+      <HeaderContainer title={adAccount.name} />
       {loading ? (
         <div className='text-center my-5'>
           <div className='spinner-border text-primary' role='status'>
@@ -462,65 +462,8 @@ function AdAccount({ adAccountId }) {
         </div>
       ) : (
         <>
-          <h1 className='text-center my-3'>{adAccount.name}</h1>
-
           {/* 集資資料 */}
-          {project.name ? (
-            <div className='row'>
-              <div className='col-12 col-md-6'>
-                <div
-                  style={{
-                    margin: '0 auto',
-                    maxWidth: '480px',
-                  }}
-                >
-                  <div
-                    style={{
-                      paddingTop: '56.25%',
-                      backgroundImage: `url(${project.og_image})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }}
-                  ></div>
-                </div>
-              </div>
-              <div className='col-12 col-md-6 p-3'>
-                <p>
-                  {/* TODO: 串接其他平台 */}
-                  <a
-                    href={
-                      'https://www.zeczec.com/projects/' + adAccount.projectId
-                    }
-                    target='blank'
-                  >
-                    {project.name}
-                  </a>
-                </p>
-                <h3>{project.funding_current}</h3>
-                <hr />
-                <p>
-                  <span className='font-weight-bolder mr-3'>目標</span>
-                  <span className='text-secondary'>
-                    {project.funding_target}
-                  </span>
-                </p>
-                <p>
-                  <span className='font-weight-bolder mr-3'>贊助人數</span>
-                  <span className='text-secondary'>
-                    {project.sponsor_count}
-                  </span>
-                </p>
-                <p>
-                  <span className='font-weight-bolder mr-3'>時程</span>
-                  <span className='text-secondary'>
-                    {project.started_at} ~ {project.finished_at}
-                  </span>
-                </p>
-              </div>
-            </div>
-          ) : (
-            ''
-          )}
+          <ProjectContainer project={project} adAccount={adAccount} />
 
           {/* 圖表 */}
           <div className='my-5' style={{ height: '300px' }}>

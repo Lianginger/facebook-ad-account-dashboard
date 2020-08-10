@@ -2,9 +2,9 @@ import React from 'react'
 import { navigate } from '@reach/router'
 import { SvgLogo, SvgArrowLeft } from '../svgs'
 
-import './Header.scss'
+import './HeaderContainer.scss'
 
-const Header = () => {
+const HeaderContainer = ({ title }) => {
   return (
     <header className='header'>
       <div className='header__line-left'>
@@ -15,6 +15,7 @@ const Header = () => {
           <SvgArrowLeft className='header__arrow-left' />
           <span className='header__back-to-home-text'>Home</span>
         </div>
+        <div className='header__title'>{title}</div>
       </div>
       <SvgLogo className='header__logo' />
       <div className='header__line-right'></div>
@@ -22,4 +23,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default HeaderContainer

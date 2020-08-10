@@ -1,0 +1,65 @@
+@import '../styles/theme.scss';
+
+.project__image {
+  margin-bottom: 30px;
+  div {
+    padding-top: 63.57%;
+    background-size: cover;
+    background-position: center;
+  }
+}
+
+.project__content {
+  .project__content-title {
+    margin-bottom: 7.8px;
+    font-size: 16px;
+    line-height: 20px;
+    a {
+      color: $primary;
+    }
+  }
+  .project__content-funding-current {
+    font-size: 36px;
+    line-height: 46px;
+    letter-spacing: 0.05em;
+    color: $main;
+    margin-bottom: 25px;
+  }
+  .project__content-info {
+    margin-bottom: 45px;
+
+    .project__content-info-list {
+      line-height: 34px;
+      font-size: 16px;
+      color: $main;
+      .list__key {
+        width: 80px;
+        display: inline-block;
+        opacity: 0.5;
+      }
+      .list__value {
+        display: inline-block;
+      }
+    }
+  }
+}
+
+.project__ad-stats {
+  display: flex;
+  margin-bottom: 100px;
+  .ad-stats__list {
+    flex: 0 0 50%;
+    .ad-stats__key {
+      font-size: 16px;
+      line-height: 20px;
+      color: $primary;
+      margin-bottom: 8px;
+    }
+    .ad-stats__value {
+      font-size: 36px;
+      line-height: 46px;
+      letter-spacing: 0.05em;
+      color: $main;
+    }
+  }
+}
