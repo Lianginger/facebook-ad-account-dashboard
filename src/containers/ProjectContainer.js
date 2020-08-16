@@ -1,8 +1,12 @@
 import React from 'react'
-import { format } from '../pages/utils'
+import { format } from '../utils/utils'
 import './ProjectContainer.scss'
 
 const ProjectContainer = ({ project, adAccount }) => {
+  if (!project.id) {
+    return null
+  }
+
   const fundingCurrentNumber = Number(
     project.funding_current.replace(/NTD /g, '').replace(/,/g, '')
   )

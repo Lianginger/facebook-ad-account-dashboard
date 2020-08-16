@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useImmer } from 'use-immer'
 import { Line } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import { format } from './utils'
+import { format } from '../utils/utils'
 
 import { HeaderContainer, ProjectContainer } from '../containers'
 
@@ -90,7 +90,11 @@ function AdAccount({ adAccountId }) {
   }
 
   const leadLineChartData = {
-    labels: [...adAccount.dateArray].reverse(),
+    labels: project.projectStartIndex
+      ? [...adAccount.dateArray]
+          .reverse()
+          .slice(0, project.projectStartIndex + 1)
+      : [...adAccount.dateArray].reverse(),
     datasets: [
       {
         label: 'CPL',
@@ -98,14 +102,20 @@ function AdAccount({ adAccountId }) {
         borderColor: '#1f4068',
         pointBackgroundColor: '#1f4068',
         pointHoverBackgroundColor: '#1f4068',
-        data: [...adAccount.costPerLeadDaily].reverse(),
+        data: project.projectStartIndex
+          ? [...adAccount.costPerLeadDaily]
+              .reverse()
+              .slice(0, project.projectStartIndex + 1)
+          : [...adAccount.costPerLeadDaily].reverse(),
         yAxisID: 'y-axis-1',
       },
     ],
   }
 
   const fundRaisingLineChartData = {
-    labels: [...adAccount.dateArray].reverse(),
+    labels: project.projectStartIndex
+      ? [...adAccount.dateArray].reverse().slice(project.projectStartIndex)
+      : [],
     datasets: [
       {
         label: '總體 ROAS',
@@ -113,7 +123,11 @@ function AdAccount({ adAccountId }) {
         borderColor: '#e43f5a',
         pointBackgroundColor: '#e43f5a',
         pointHoverBackgroundColor: '#e43f5a',
-        data: [...adAccount.totalRoasDaily].reverse(),
+        data: project.projectStartIndex
+          ? [...adAccount.totalRoasDaily]
+              .reverse()
+              .slice(project.projectStartIndex)
+          : [],
         yAxisID: 'y-axis-2',
       },
     ],
@@ -361,6 +375,11 @@ function AdAccount({ adAccountId }) {
   useEffect(() => {
     if (!project.timeline) return
 
+    const projectStartDate = project.started_at.slice(0, 10)
+    const projectStartIndex = [...adAccount.dateArray]
+      .reverse()
+      .findIndex((e) => e === projectStartDate)
+
     // Add datetime.slice(0,-1) to cut the denoted by the suffix "Z"
     let projectStartAt =
       new Date(project.started_at.slice(0, -1)).getTime() / 1000
@@ -398,8 +417,15 @@ function AdAccount({ adAccountId }) {
     setProject((state) => {
       state.fundRaisingDateMap = fundRaisingDateMap
       state.orderCountDateMap = orderCountDateMap
+      state.projectStartIndex = projectStartIndex
     })
-  }, [project.timeline, project.started_at, project.finished_at, setProject])
+  }, [
+    project.timeline,
+    project.started_at,
+    project.finished_at,
+    setProject,
+    adAccount.dateArray,
+  ])
 
   // 嘖嘖集資資料 => 廣數數據資料
   useEffect(() => {
@@ -469,12 +495,14 @@ function AdAccount({ adAccountId }) {
           <div className='my-5' style={{ height: '300px' }}>
             <Line data={leadLineChartData} options={chartConfigOptions} />
           </div>
-          <div className='my-5' style={{ height: '300px' }}>
-            <Line
-              data={fundRaisingLineChartData}
-              options={chartConfigOptions}
-            />
-          </div>
+          {project.id && (
+            <div className='my-5' style={{ height: '300px' }}>
+              <Line
+                data={fundRaisingLineChartData}
+                options={chartConfigOptions}
+              />
+            </div>
+          )}
 
           {/* 走速表 */}
           <div className='table-responsive'>

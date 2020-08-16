@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { navigate } from '@reach/router'
-import { format } from './utils'
+import { format } from '../utils/utils'
 
 import './Home.css'
 
@@ -29,16 +29,12 @@ function Home() {
     window.checkLoginState = function () {
       window.FB
         ? window.FB.getLoginStatus((res) => {
-            console.log(res)
-
             if (res.status === 'connected') {
               // Logged into your webpage and Facebook.
               setUser((state) => ({
                 ...state,
                 isLogin: true,
               }))
-
-              console.log('fetchUserAndAdAccounts')
               fetchUserAndAdAccounts()
             } else {
               // Not logged into your webpage or we are unable to tell.
@@ -173,7 +169,11 @@ function Home() {
           </main>
         </>
       ) : (
-        ''
+        <div className='text-center my-5'>
+          <div className='spinner-border text-primary' role='status'>
+            <span className='sr-only'>Loading...</span>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -191,7 +191,7 @@ function Home() {
         let sortedAdAccountsData = res.adaccounts.data.sort(
           (a, b) => a.age - b.age
         )
-        console.log(sortedAdAccountsData)
+
         // 遍歷廣告活動狀態，在廣告帳戶物件加上 adAccountLive flag
         sortedAdAccountsData = sortedAdAccountsData.map((adAccount) => {
           adAccount.adAccountLive = false
