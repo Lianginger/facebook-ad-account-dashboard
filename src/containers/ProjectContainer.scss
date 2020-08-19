@@ -45,10 +45,8 @@
 }
 
 .project__ad-stats {
-  display: flex;
-  margin-bottom: 100px;
   .ad-stats__list {
-    flex: 0 0 50%;
+    margin-bottom: 24px;
     .ad-stats__key {
       font-size: 16px;
       line-height: 20px;

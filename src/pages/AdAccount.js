@@ -379,7 +379,6 @@ function AdAccount({ adAccountId }) {
     const projectStartIndex = [...adAccount.dateArray]
       .reverse()
       .findIndex((e) => e === projectStartDate)
-
     // Add datetime.slice(0,-1) to cut the denoted by the suffix "Z"
     let projectStartAt =
       new Date(project.started_at.slice(0, -1)).getTime() / 1000
@@ -491,20 +490,98 @@ function AdAccount({ adAccountId }) {
           {/* 集資資料 */}
           <ProjectContainer project={project} adAccount={adAccount} />
 
-          {/* 圖表 */}
+          {/* 集資廣告數據 */}
+          {project.id && (
+            <>
+              <div className='my-5' style={{ height: '300px' }}>
+                <Line
+                  data={fundRaisingLineChartData}
+                  options={chartConfigOptions}
+                />
+              </div>
+              <div className='table-responsive'>
+                <div className='tableFixHead'>
+                  <table className='table'>
+                    <thead>
+                      <tr>
+                        <th scope='col'>Date</th>
+                        <th scope='col'>上線花費</th>
+                        <th scope='col'>廣告直接轉換金額</th>
+                        <th scope='col'>廣告直接 ROAS</th>
+                        <th scope='col'>每日訂單數</th>
+                        <th scope='col'>每日集資金額</th>
+                        <th scope='col'>總體 ROAS</th>
+                      </tr>
+                      <tr>
+                        <td>總計</td>
+                        <td>
+                          {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                        </td>
+                        <td>
+                          {format(
+                            adAccount.adsDirectFundRaisingTotal
+                          ).toDollar()}
+                        </td>
+                        <td>
+                          {(
+                            adAccount.adsDirectFundRaisingTotal /
+                            adAccount.fundRaisingSpendTotal
+                          ).toFixed(1)}
+                        </td>
+                        <td>{format(adAccount.orderCountTotal).toNumber()}</td>
+                        <td>{format(adAccount.fundRaisingTotal).toDollar()}</td>
+                        <td>
+                          {(
+                            adAccount.fundRaisingTotal /
+                            adAccount.fundRaisingSpendTotal
+                          ).toFixed(1)}
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adAccount.dateArray.map((date, index) => {
+                        const reserveDayCount =
+                          adAccount.dateArray.length -
+                          project.projectStartIndex -
+                          1
+                        if (index > reserveDayCount) {
+                          return null
+                        }
+                        return (
+                          <tr key={`daily-adAccount-data-${index}`}>
+                            <th>{date}</th>
+                            <td>
+                              {format(
+                                adAccount.fundRaisingSpendDaily[index]
+                              ).toDollar()}
+                            </td>
+                            <td>
+                              {format(
+                                adAccount.adsDirectFundRaisingDaily[index]
+                              ).toDollar()}
+                            </td>
+                            <td>{adAccount.adsDirectRoasDaily[index]}</td>
+                            <td>{adAccount.orderCountDaily[index]}</td>
+                            <td>
+                              {format(
+                                adAccount.fundRaisingDaily[index]
+                              ).toDollar()}
+                            </td>
+                            <td>{adAccount.totalRoasDaily[index]}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* 前測廣告數據 */}
           <div className='my-5' style={{ height: '300px' }}>
             <Line data={leadLineChartData} options={chartConfigOptions} />
           </div>
-          {project.id && (
-            <div className='my-5' style={{ height: '300px' }}>
-              <Line
-                data={fundRaisingLineChartData}
-                options={chartConfigOptions}
-              />
-            </div>
-          )}
-
-          {/* 走速表 */}
           <div className='table-responsive'>
             <div className='tableFixHead'>
               <table className='table'>
@@ -515,12 +592,6 @@ function AdAccount({ adAccountId }) {
                     <th scope='col'>名單數</th>
                     <th scope='col'>CPL</th>
                     <th scope='col'>預熱花費</th>
-                    <th scope='col'>上線花費</th>
-                    <th scope='col'>廣告直接轉換金額</th>
-                    <th scope='col'>廣告直接 ROAS</th>
-                    <th scope='col'>每日訂單數</th>
-                    <th scope='col'>每日集資金額</th>
-                    <th scope='col'>總體 ROAS</th>
                   </tr>
                   <tr>
                     <td>總計</td>
@@ -532,30 +603,15 @@ function AdAccount({ adAccountId }) {
                       )}
                     </td>
                     <td>{format(adAccount.preLaunchSpendTotal).toDollar()}</td>
-                    <td>
-                      {format(adAccount.fundRaisingSpendTotal).toDollar()}
-                    </td>
-                    <td>
-                      {format(adAccount.adsDirectFundRaisingTotal).toDollar()}
-                    </td>
-                    <td>
-                      {(
-                        adAccount.adsDirectFundRaisingTotal /
-                        adAccount.fundRaisingSpendTotal
-                      ).toFixed(1)}
-                    </td>
-                    <td>{format(adAccount.orderCountTotal).toNumber()}</td>
-                    <td>{format(adAccount.fundRaisingTotal).toDollar()}</td>
-                    <td>
-                      {(
-                        adAccount.fundRaisingTotal /
-                        adAccount.fundRaisingSpendTotal
-                      ).toFixed(1)}
-                    </td>
                   </tr>
                 </thead>
                 <tbody>
                   {adAccount.dateArray.map((date, index) => {
+                    const filterDayCount =
+                      adAccount.dateArray.length - project.projectStartIndex - 1
+                    if (index < filterDayCount) {
+                      return null
+                    }
                     return (
                       <tr key={`daily-adAccount-data-${index}`}>
                         <th>{date}</th>
@@ -571,22 +627,6 @@ function AdAccount({ adAccountId }) {
                             adAccount.preLaunchSpendDaily[index]
                           ).toDollar()}
                         </td>
-                        <td>
-                          {format(
-                            adAccount.fundRaisingSpendDaily[index]
-                          ).toDollar()}
-                        </td>
-                        <td>
-                          {format(
-                            adAccount.adsDirectFundRaisingDaily[index]
-                          ).toDollar()}
-                        </td>
-                        <td>{adAccount.adsDirectRoasDaily[index]}</td>
-                        <td>{adAccount.orderCountDaily[index]}</td>
-                        <td>
-                          {format(adAccount.fundRaisingDaily[index]).toDollar()}
-                        </td>
-                        <td>{adAccount.totalRoasDaily[index]}</td>
                       </tr>
                     )
                   })}

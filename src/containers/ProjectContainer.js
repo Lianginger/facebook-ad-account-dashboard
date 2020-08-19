@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { format } from '../utils/utils'
 import './ProjectContainer.scss'
 
 const ProjectContainer = ({ project, adAccount }) => {
+  const [countdown, setCountdown] = useState('')
   if (!project.id) {
     return null
   }
@@ -24,6 +25,19 @@ const ProjectContainer = ({ project, adAccount }) => {
       adAccount.preLaunchSpendTotal +
       adAccount.fundRaisingSpendTotal
   ).toDollar()
+
+  setInterval(function () {
+    const countDownDate = new Date(project.finished_at).getTime()
+    const now = new Date().getTime()
+    const distance = countDownDate - now
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    )
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+    setCountdown(`${days} 日 ${hours} 時 ${minutes} 分 ${seconds} 秒`)
+  }, 1000)
 
   return (
     <div className='row'>
@@ -66,14 +80,18 @@ const ProjectContainer = ({ project, adAccount }) => {
           </div>
         </div>
       </div>
-      <div className='col-12 col-lg-4 project__ad-stats'>
-        <div className='ad-stats__list'>
+      <div className='col-12 col-lg-4 project__ad-stats row'>
+        <div className='col-6 ad-stats__list'>
           <div className='ad-stats__key'>平均 CPL</div>
           <div className='ad-stats__value'>{costPerAverageLead}</div>
         </div>
-        <div className='ad-stats__list'>
+        <div className='col-6 ad-stats__list'>
           <div className='ad-stats__key'>花費</div>
           <div className='ad-stats__value'>{totalSpend}</div>
+        </div>
+        <div className='col-12 ad-stats__list'>
+          <div className='ad-stats__key'>倒數</div>
+          <div className='ad-stats__value'>{countdown}</div>
         </div>
       </div>
     </div>
