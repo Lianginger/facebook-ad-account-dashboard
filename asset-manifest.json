@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/facebook-ad-account-dashboard/static/css/main.8045c143.chunk.css",
-    "main.js": "/facebook-ad-account-dashboard/static/js/main.88a1d09e.chunk.js",
-    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.88a1d09e.chunk.js.map",
+    "main.css": "/facebook-ad-account-dashboard/static/css/main.406a05ee.chunk.css",
+    "main.js": "/facebook-ad-account-dashboard/static/js/main.c064dd42.chunk.js",
+    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.c064dd42.chunk.js.map",
     "runtime-main.js": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js",
     "runtime-main.js.map": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js.map",
     "static/css/2.69121389.chunk.css": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css",
-    "static/js/2.b084f3cb.chunk.js": "/facebook-ad-account-dashboard/static/js/2.b084f3cb.chunk.js",
-    "static/js/2.b084f3cb.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.b084f3cb.chunk.js.map",
+    "static/js/2.108990d9.chunk.js": "/facebook-ad-account-dashboard/static/js/2.108990d9.chunk.js",
+    "static/js/2.108990d9.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.108990d9.chunk.js.map",
     "index.html": "/facebook-ad-account-dashboard/index.html",
-    "precache-manifest.c80e012477bf96c7a8c4e6394c0c0061.js": "/facebook-ad-account-dashboard/precache-manifest.c80e012477bf96c7a8c4e6394c0c0061.js",
+    "precache-manifest.1466da7626bdbd2ae9308ecacb4fd6a8.js": "/facebook-ad-account-dashboard/precache-manifest.1466da7626bdbd2ae9308ecacb4fd6a8.js",
     "service-worker.js": "/facebook-ad-account-dashboard/service-worker.js",
     "static/css/2.69121389.chunk.css.map": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css.map",
-    "static/css/main.8045c143.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.8045c143.chunk.css.map",
-    "static/js/2.b084f3cb.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.b084f3cb.chunk.js.LICENSE.txt"
+    "static/css/main.406a05ee.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.406a05ee.chunk.css.map",
+    "static/js/2.108990d9.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.108990d9.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dba334fc.js",
     "static/css/2.69121389.chunk.css",
-    "static/js/2.b084f3cb.chunk.js",
-    "static/css/main.8045c143.chunk.css",
-    "static/js/main.88a1d09e.chunk.js"
+    "static/js/2.108990d9.chunk.js",
+    "static/css/main.406a05ee.chunk.css",
+    "static/js/main.c064dd42.chunk.js"
   ]
 }
