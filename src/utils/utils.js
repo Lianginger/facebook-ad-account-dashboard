@@ -12,6 +12,12 @@ export function format(data) {
       const [date, time] = data.split('T')
       return !data ? '' : `${date} ${time.substring(0, 5)}`
     },
+    toPercentage() {
+      if (!data) {
+        return ''
+      }
+      return `${Number(data * 100).toFixed(1)} %`
+    },
     toDate() {
       // input unix time
       const newDate = new Date(data)

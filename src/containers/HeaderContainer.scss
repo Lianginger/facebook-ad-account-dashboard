@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 25px;
+  position: relative;
 
   .header__line-left,
   .header__line-right {
@@ -55,14 +56,30 @@
     flex: 0 0 auto;
   }
 
+  .header__account {
+    position: absolute;
+    right: 85px;
+    top: -5px;
+    cursor: pointer;
+  }
+
   @media screen and (min-width: 768px) {
     .header__line-left,
     .header__line-right {
       border: 1px solid #0a2240;
     }
+    .header__line-left {
+      .header__title {
+        font-size: 36px;
+      }
+    }
     .header__line-right {
       display: inline-block;
       flex: 1 1 auto;
+    }
+    .header__account {
+      position: absolute;
+      right: 0px;
     }
   }
 }

@@ -25,18 +25,29 @@ const ProjectContainer = ({ project, adAccount }) => {
       adAccount.preLaunchSpendTotal +
       adAccount.fundRaisingSpendTotal
   ).toDollar()
+  const totalSpendPerFundingCurrent =
+    (adAccount.leadSpendTotal +
+      adAccount.preLaunchSpendTotal +
+      adAccount.fundRaisingSpendTotal) /
+    fundingCurrentNumber
 
-  setInterval(function () {
+  const countdownInterval = setInterval(function () {
     const countDownDate = new Date(project.finished_at).getTime()
     const now = new Date().getTime()
     const distance = countDownDate - now
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-    const hours = Math.floor(
-      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-    )
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-    setCountdown(`${days} 日 ${hours} 時 ${minutes} 分 ${seconds} 秒`)
+
+    if (distance <= 0) {
+      setCountdown(`已結束`)
+      clearInterval(countdownInterval)
+    } else {
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      )
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+      setCountdown(`${days} 日 ${hours} 時 ${minutes} 分`)
+    }
   }, 1000)
 
   return (
@@ -44,19 +55,31 @@ const ProjectContainer = ({ project, adAccount }) => {
       <div className='col-12 col-sm-6 col-lg-4 project__image'>
         <div style={{ backgroundImage: `url(${project.og_image})` }}></div>
       </div>
-      <div className='col-12 col-sm-6 col-lg-4 project__content'>
-        <div className='project__content-title'>
-          {/* TODO: 串接其他平台 */}
-          <a
-            href={'https://www.zeczec.com/projects/' + adAccount.projectId}
-            target='blank'
-          >
-            {project.name}
-          </a>
+      <div className='col-12 col-sm-6 col-lg-4 project__ad-stats row'>
+        <div className='col-12 ad-stats__list'>
+          <div className='ad-stats__key'>
+            {/* TODO: 串接其他平台 */}
+            <a
+              href={'https://www.zeczec.com/projects/' + adAccount.projectId}
+              target='blank'
+            >
+              {project.name}
+            </a>
+          </div>
+          <div className='ad-stats__value'>{project.funding_current}</div>
         </div>
-        <h2 className='project__content-funding-current'>
-          {project.funding_current}
-        </h2>
+        <div className='col-12 ad-stats__list'>
+          <div className='ad-stats__key'>廣告花費</div>
+          <div className='ad-stats__value'>{totalSpend}</div>
+        </div>
+        <div className='col-12 ad-stats__list'>
+          <div className='ad-stats__key'>廣告占比</div>
+          <div className='ad-stats__value'>
+            {format(totalSpendPerFundingCurrent).toPercentage()}
+          </div>
+        </div>
+      </div>
+      <div className='col-12 col-sm-6 col-lg-4 project__content'>
         <div className='project__content-info'>
           <div className='project__content-info-list'>
             <div className='list__key'>目標</div>
@@ -78,20 +101,14 @@ const ProjectContainer = ({ project, adAccount }) => {
               {project.started_at} ~ {project.finished_at}
             </div>
           </div>
-        </div>
-      </div>
-      <div className='col-12 col-lg-4 project__ad-stats row'>
-        <div className='col-6 ad-stats__list'>
-          <div className='ad-stats__key'>平均 CPL</div>
-          <div className='ad-stats__value'>{costPerAverageLead}</div>
-        </div>
-        <div className='col-6 ad-stats__list'>
-          <div className='ad-stats__key'>花費</div>
-          <div className='ad-stats__value'>{totalSpend}</div>
-        </div>
-        <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>倒數</div>
-          <div className='ad-stats__value'>{countdown}</div>
+          <div className='project__content-info-list'>
+            <div className='list__key'>倒數</div>
+            <div className='list__value'>{countdown}</div>
+          </div>
+          <div className='project__content-info-list'>
+            <div className='list__key'>平均 CPL</div>
+            <div className='list__value'>{costPerAverageLead}</div>
+          </div>
         </div>
       </div>
     </div>

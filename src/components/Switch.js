@@ -1,7 +1,7 @@
 import React from 'react'
 import './Switch.css'
 
-const Switch = ({ labelFor, isOn, handleToggle, onColor }) => {
+const Switch = ({ labelFor, isOn, handleToggle, onColor, title }) => {
   return (
     <>
       <div className='switch-container'>
@@ -19,6 +19,7 @@ const Switch = ({ labelFor, isOn, handleToggle, onColor }) => {
         >
           <span className={`react-switch-button`} />
         </label>
+        <span>只顯示活躍廣告帳戶</span>
       </div>
     </>
   )

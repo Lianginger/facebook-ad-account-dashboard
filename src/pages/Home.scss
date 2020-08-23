@@ -1,0 +1,13 @@
+.ad-accounts__switch {
+  position: absolute;
+  top: 55px;
+  left: 110px;
+  @media screen and (min-width: 768px) {
+    left: 160px;
+  }
+}
+
+.ad-account-card:hover {
+  cursor: pointer;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.3);
+}

@@ -26,10 +26,8 @@
     margin-bottom: 25px;
   }
   .project__content-info {
-    margin-bottom: 45px;
-
     .project__content-info-list {
-      line-height: 34px;
+      line-height: 38px;
       font-size: 16px;
       color: $main;
       .list__key {
@@ -46,16 +44,15 @@
 
 .project__ad-stats {
   .ad-stats__list {
-    margin-bottom: 24px;
+    margin-bottom: 15px;
     .ad-stats__key {
       font-size: 16px;
       line-height: 20px;
       color: $primary;
-      margin-bottom: 8px;
     }
     .ad-stats__value {
-      font-size: 36px;
-      line-height: 46px;
+      font-size: 32px;
+      line-height: 40px;
       letter-spacing: 0.05em;
       color: $main;
     }

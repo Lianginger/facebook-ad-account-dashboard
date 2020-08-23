@@ -1,6 +1,8 @@
 .switch-container {
   margin: 0 0.6em;
-  display: inline-block;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .react-switch-checkbox {
@@ -22,6 +24,7 @@
   border-radius: 40px;
   position: relative;
   transition: background-color 0.2s;
+  margin-right: 0.5em;
 }
 
 .react-switch-label .react-switch-button {

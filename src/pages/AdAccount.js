@@ -46,6 +46,16 @@ function AdAccount({ adAccountId }) {
 
   const chartConfigOptions = {
     maintainAspectRatio: false,
+    elements: {
+      line: {
+        tension: 0,
+        borderWidth: 2,
+      },
+      point: {
+        radius: 0,
+      },
+    },
+
     hover: {
       intersect: false,
     },
@@ -120,11 +130,24 @@ function AdAccount({ adAccountId }) {
       {
         label: '總體 ROAS',
         fill: false,
-        borderColor: '#e43f5a',
-        pointBackgroundColor: '#e43f5a',
-        pointHoverBackgroundColor: '#e43f5a',
+        borderColor: '#84256A',
+        pointBackgroundColor: '#84256A',
+        pointHoverBackgroundColor: '#84256A',
         data: project.projectStartIndex
           ? [...adAccount.totalRoasDaily]
+              .reverse()
+              .slice(project.projectStartIndex)
+          : [],
+        yAxisID: 'y-axis-2',
+      },
+      {
+        label: '廣告 ROAS',
+        fill: false,
+        borderColor: '#FF48CC',
+        pointBackgroundColor: '#FF48CC',
+        pointHoverBackgroundColor: '#FF48CC',
+        data: project.projectStartIndex
+          ? [...adAccount.adsDirectRoasDaily]
               .reverse()
               .slice(project.projectStartIndex)
           : [],
