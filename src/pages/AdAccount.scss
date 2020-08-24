@@ -1,22 +1,71 @@
-.tableFixHead {
-  overflow-y: auto;
-  height: 80vh;
-  text-align: center;
-}
+.adAccount__table {
+  background: #f8f8f8;
+  font-size: 14px;
+  position: relative;
+  .container {
+    padding: 0;
+    padding-top: 40px;
+  }
 
-.tableFixHead thead tr th {
-  position: sticky;
-  top: 0px;
-  background-color: #dee2e6;
-}
+  .adAccount__table-title {
+    position: absolute;
+    font-size: 24px;
+    line-height: 50px;
+    width: 160px;
+    height: 50px;
+    border-radius: 5px;
+    color: #ffffff;
+    text-align: center;
+    top: -25px;
+    left: calc(50% - 80px);
+    z-index: 1;
+  }
+  &.adAccount__table--fundRaising {
+    .adAccount__table-title {
+      background-color: #84256a;
+    }
+    .container {
+      border-top: 1px solid #84256a;
+    }
+  }
+  &.adAccount__table--lead {
+    .adAccount__table-title {
+      background-color: #0b3760;
+    }
+    .container {
+      border-top: 1px solid #0b3760;
+    }
+  }
 
-.tableFixHead thead tr:nth-child(2) td {
-  position: sticky;
-  top: 48.3px;
-  background-color: #dee2e6;
-}
+  .tableFixHead {
+    overflow-y: auto;
+    height: 80vh;
+    text-align: center;
+  }
 
-.table td,
-.table th {
-  white-space: nowrap;
+  .tableFixHead thead tr td {
+    position: sticky;
+    top: 0px;
+    background-color: #f8f8f8;
+  }
+
+  .tableFixHead thead tr:nth-child(2) th {
+    position: sticky;
+    top: 48.3px;
+    background-color: #f8f8f8;
+  }
+
+  .table td,
+  .table th {
+    white-space: nowrap;
+  }
+  .table--hide-in-mobile {
+    display: none;
+  }
+  @media screen and (min-width: 768px) {
+    font-size: 16px;
+    .table--hide-in-mobile {
+      display: table-cell;
+    }
+  }
 }

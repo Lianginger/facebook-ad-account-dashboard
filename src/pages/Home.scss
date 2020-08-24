@@ -6,6 +6,29 @@
     left: 160px;
   }
 }
+.ad-account-card {
+  .badge {
+    color: #ffffff;
+    font-size: 18px;
+  }
+  .badge-launch {
+    background-color: #ff48cc;
+  }
+  .badge-pre-launch {
+    background-color: #84256a;
+  }
+  .badge-lead {
+    background-color: #166bb9;
+  }
+  .card-title {
+    height: 60px;
+    overflow: hidden;
+    font-size: 24px;
+  }
+  .card-text {
+    font-size: 18px;
+  }
+}
 
 .ad-account-card:hover {
   cursor: pointer;

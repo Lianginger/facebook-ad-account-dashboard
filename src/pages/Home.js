@@ -47,7 +47,7 @@ function Home({ adAccounts }) {
               ({ name, id, adAccountLive, campaignStatus, amount_spent }) => (
                 <div
                   key={id}
-                  className='card m-1 ad-account-card'
+                  className='card m-2 ad-account-card'
                   style={{ width: '18rem', opacity: !adAccountLive && 0.3 }}
                 >
                   <div
@@ -62,11 +62,11 @@ function Home({ adAccounts }) {
                       className={
                         'float-right badge badge-' +
                         (campaignStatus.value === 3
-                          ? 'success'
+                          ? 'launch'
                           : campaignStatus.value === 2
-                          ? 'primary'
+                          ? 'pre-launch'
                           : campaignStatus.value === 1
-                          ? 'secondary'
+                          ? 'lead'
                           : '')
                       }
                     >

@@ -44,7 +44,7 @@ function AdAccount({ adAccountId }) {
     orderCountDateMap: undefined,
   })
 
-  const chartConfigOptions = {
+  const chartGlobalOptions = {
     maintainAspectRatio: false,
     elements: {
       line: {
@@ -55,7 +55,6 @@ function AdAccount({ adAccountId }) {
         radius: 0,
       },
     },
-
     hover: {
       intersect: false,
     },
@@ -63,63 +62,6 @@ function AdAccount({ adAccountId }) {
       mode: 'index',
       intersect: false,
     },
-    scales: {
-      yAxes: [
-        {
-          type: 'linear',
-          display: true,
-          position: 'left',
-          id: 'y-axis-1',
-          gridLines: {
-            drawOnChartArea: false,
-          },
-          scaleLabel: {
-            display: true,
-            labelString: '名單取得成本',
-          },
-        },
-        {
-          type: 'linear',
-          display: true,
-          position: 'right',
-          id: 'y-axis-2',
-          scaleLabel: {
-            display: true,
-            labelString: 'ROAS',
-          },
-        },
-      ],
-    },
-    plugins: {
-      datalabels: {
-        color: 'black',
-        align: 'top',
-        offset: 8,
-      },
-    },
-  }
-
-  const leadLineChartData = {
-    labels: project.projectStartIndex
-      ? [...adAccount.dateArray]
-          .reverse()
-          .slice(0, project.projectStartIndex + 1)
-      : [...adAccount.dateArray].reverse(),
-    datasets: [
-      {
-        label: 'CPL',
-        fill: false,
-        borderColor: '#1f4068',
-        pointBackgroundColor: '#1f4068',
-        pointHoverBackgroundColor: '#1f4068',
-        data: project.projectStartIndex
-          ? [...adAccount.costPerLeadDaily]
-              .reverse()
-              .slice(0, project.projectStartIndex + 1)
-          : [...adAccount.costPerLeadDaily].reverse(),
-        yAxisID: 'y-axis-1',
-      },
-    ],
   }
 
   const fundRaisingLineChartData = {
@@ -133,12 +75,16 @@ function AdAccount({ adAccountId }) {
         borderColor: '#84256A',
         pointBackgroundColor: '#84256A',
         pointHoverBackgroundColor: '#84256A',
+        datalabels: {
+          color: '#84256A',
+          align: 'top',
+          offset: 8,
+        },
         data: project.projectStartIndex
           ? [...adAccount.totalRoasDaily]
               .reverse()
               .slice(project.projectStartIndex)
           : [],
-        yAxisID: 'y-axis-2',
       },
       {
         label: '廣告 ROAS',
@@ -146,14 +92,96 @@ function AdAccount({ adAccountId }) {
         borderColor: '#FF48CC',
         pointBackgroundColor: '#FF48CC',
         pointHoverBackgroundColor: '#FF48CC',
+        datalabels: {
+          color: '#FF48CC',
+          align: 'bottom',
+          offset: 8,
+        },
         data: project.projectStartIndex
           ? [...adAccount.adsDirectRoasDaily]
               .reverse()
               .slice(project.projectStartIndex)
           : [],
-        yAxisID: 'y-axis-2',
       },
     ],
+  }
+  const fundRaisingLineChartOptions = {
+    ...chartGlobalOptions,
+    scales: {
+      yAxes: [
+        {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          scaleLabel: {
+            display: true,
+            labelString: 'ROAS',
+          },
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            callback: function (value, index, values) {
+              return value.slice(5)
+            },
+          },
+        },
+      ],
+    },
+  }
+
+  const leadLineChartData = {
+    labels: project.projectStartIndex
+      ? [...adAccount.dateArray]
+          .reverse()
+          .slice(0, project.projectStartIndex + 1)
+      : [...adAccount.dateArray].reverse(),
+    datasets: [
+      {
+        label: 'CPL',
+        fill: false,
+        borderColor: '#166BB9',
+        pointBackgroundColor: '#166BB9',
+        pointHoverBackgroundColor: '#166BB9',
+        datalabels: {
+          color: '#166BB9',
+          align: 'top',
+          offset: 8,
+        },
+        data: project.projectStartIndex
+          ? [...adAccount.costPerLeadDaily]
+              .reverse()
+              .slice(0, project.projectStartIndex + 1)
+          : [...adAccount.costPerLeadDaily].reverse(),
+      },
+    ],
+  }
+  const leadLineChartOptions = {
+    ...chartGlobalOptions,
+    scales: {
+      yAxes: [
+        {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          scaleLabel: {
+            fontColor: '#166BB9',
+            display: true,
+            labelString: '名單取得成本',
+          },
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            callback: function (value, index, values) {
+              return value.slice(5)
+            },
+          },
+        },
+      ],
+    },
   }
 
   // 取得廣告帳號資料、廣告數據資料
@@ -500,8 +528,10 @@ function AdAccount({ adAccountId }) {
   ])
 
   return (
-    <div className='container my-3'>
-      <HeaderContainer title={adAccount.name} />
+    <>
+      <div className='container my-3'>
+        <HeaderContainer title={adAccount.name} />
+      </div>
       {loading ? (
         <div className='text-center my-5'>
           <div className='spinner-border text-primary' role='status'>
@@ -511,155 +541,179 @@ function AdAccount({ adAccountId }) {
       ) : (
         <>
           {/* 集資資料 */}
-          <ProjectContainer project={project} adAccount={adAccount} />
+          <div className='container'>
+            <ProjectContainer project={project} adAccount={adAccount} />
+          </div>
 
           {/* 集資廣告數據 */}
           {project.id && (
             <>
-              <div className='my-5' style={{ height: '300px' }}>
+              <div className='container my-5' style={{ height: '300px' }}>
                 <Line
                   data={fundRaisingLineChartData}
-                  options={chartConfigOptions}
+                  options={fundRaisingLineChartOptions}
                 />
               </div>
-              <div className='table-responsive'>
-                <div className='tableFixHead'>
-                  <table className='table'>
-                    <thead>
-                      <tr>
-                        <th scope='col'>Date</th>
-                        <th scope='col'>上線花費</th>
-                        <th scope='col'>廣告直接轉換金額</th>
-                        <th scope='col'>廣告直接 ROAS</th>
-                        <th scope='col'>每日訂單數</th>
-                        <th scope='col'>每日集資金額</th>
-                        <th scope='col'>總體 ROAS</th>
-                      </tr>
-                      <tr>
-                        <td>總計</td>
-                        <td>
-                          {format(adAccount.fundRaisingSpendTotal).toDollar()}
-                        </td>
-                        <td>
-                          {format(
-                            adAccount.adsDirectFundRaisingTotal
-                          ).toDollar()}
-                        </td>
-                        <td>
-                          {(
-                            adAccount.adsDirectFundRaisingTotal /
-                            adAccount.fundRaisingSpendTotal
-                          ).toFixed(1)}
-                        </td>
-                        <td>{format(adAccount.orderCountTotal).toNumber()}</td>
-                        <td>{format(adAccount.fundRaisingTotal).toDollar()}</td>
-                        <td>
-                          {(
-                            adAccount.fundRaisingTotal /
-                            adAccount.fundRaisingSpendTotal
-                          ).toFixed(1)}
-                        </td>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {adAccount.dateArray.map((date, index) => {
-                        const reserveDayCount =
-                          adAccount.dateArray.length -
-                          project.projectStartIndex -
-                          1
-                        if (index > reserveDayCount) {
-                          return null
-                        }
-                        return (
-                          <tr key={`daily-adAccount-data-${index}`}>
-                            <th>{date}</th>
-                            <td>
-                              {format(
-                                adAccount.fundRaisingSpendDaily[index]
-                              ).toDollar()}
-                            </td>
-                            <td>
-                              {format(
-                                adAccount.adsDirectFundRaisingDaily[index]
-                              ).toDollar()}
-                            </td>
-                            <td>{adAccount.adsDirectRoasDaily[index]}</td>
-                            <td>{adAccount.orderCountDaily[index]}</td>
-                            <td>
-                              {format(
-                                adAccount.fundRaisingDaily[index]
-                              ).toDollar()}
-                            </td>
-                            <td>{adAccount.totalRoasDaily[index]}</td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+              <div className='adAccount__table adAccount__table--fundRaising'>
+                <div className='adAccount__table-title'>每日數據</div>
+                <div className='container table-responsive'>
+                  <div className='tableFixHead'>
+                    <table className='table'>
+                      <thead>
+                        <tr>
+                          <td>Date</td>
+                          <td className='table--hide-in-mobile'>
+                            每日集資金額
+                          </td>
+                          <td className='table--hide-in-mobile'>每日訂單數</td>
+                          <td>上線廣告花費</td>
+                          <td>廣告直接轉換金額</td>
+                          <td>廣告直接 ROAS</td>
+                          <td>總體 ROAS</td>
+                        </tr>
+                        <tr>
+                          <th>總計</th>
+                          <th className='table--hide-in-mobile'>
+                            {format(adAccount.fundRaisingTotal).toDollar()}
+                          </th>
+                          <th className='table--hide-in-mobile'>
+                            {format(adAccount.orderCountTotal).toNumber()}
+                          </th>
+                          <th>
+                            {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                          </th>
+                          <th>
+                            {format(
+                              adAccount.adsDirectFundRaisingTotal
+                            ).toDollar()}
+                          </th>
+                          <th>
+                            {(
+                              adAccount.adsDirectFundRaisingTotal /
+                              adAccount.fundRaisingSpendTotal
+                            ).toFixed(1)}
+                          </th>
+                          <th>
+                            {(
+                              adAccount.fundRaisingTotal /
+                              adAccount.fundRaisingSpendTotal
+                            ).toFixed(1)}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {adAccount.dateArray.map((date, index) => {
+                          const reserveDayCount =
+                            adAccount.dateArray.length -
+                            project.projectStartIndex -
+                            1
+                          if (index > reserveDayCount) {
+                            return null
+                          }
+                          return (
+                            <tr key={`daily-adAccount-data-${index}`}>
+                              <th>{date}</th>
+                              <td className='table--hide-in-mobile'>
+                                {format(
+                                  adAccount.fundRaisingDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td className='table--hide-in-mobile'>
+                                {adAccount.orderCountDaily[index]}
+                              </td>
+                              <td>
+                                {format(
+                                  adAccount.fundRaisingSpendDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td>
+                                {format(
+                                  adAccount.adsDirectFundRaisingDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td>{adAccount.adsDirectRoasDaily[index]}</td>
+                              <td>{adAccount.totalRoasDaily[index]}</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </>
           )}
 
           {/* 前測廣告數據 */}
-          <div className='my-5' style={{ height: '300px' }}>
-            <Line data={leadLineChartData} options={chartConfigOptions} />
+          <div className='container my-5' style={{ height: '300px' }}>
+            <Line data={leadLineChartData} options={leadLineChartOptions} />
           </div>
-          <div className='table-responsive'>
-            <div className='tableFixHead'>
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th scope='col'>Date</th>
-                    <th scope='col'>前測花費</th>
-                    <th scope='col'>名單數</th>
-                    <th scope='col'>CPL</th>
-                    <th scope='col'>預熱花費</th>
-                  </tr>
-                  <tr>
-                    <td>總計</td>
-                    <td>{format(adAccount.leadSpendTotal).toDollar()}</td>
-                    <td>{format(adAccount.leadTotal).toNumber()}</td>
-                    <td>
-                      {(adAccount.leadSpendTotal / adAccount.leadTotal).toFixed(
+          <div className='adAccount__table adAccount__table--lead'>
+            <div className='adAccount__table-title'>每日數據</div>
+            <div className='container table-responsive'>
+              <div className='tableFixHead'>
+                <table className='table'>
+                  <thead>
+                    <tr>
+                      <td>Date</td>
+                      <td>前測花費</td>
+                      <td>名單數</td>
+                      <td>CPL</td>
+                      <td className='table--hide-in-mobile'>預熱花費</td>
+                    </tr>
+                    <tr>
+                      <th>總計</th>
+                      <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
+                      <th>{format(adAccount.leadTotal).toNumber()}</th>
+                      <th>
+                        {(
+                          adAccount.leadSpendTotal / adAccount.leadTotal
+                        ).toFixed(1)}
+                      </th>
+                      <th className='table--hide-in-mobile'>
+                        {format(adAccount.preLaunchSpendTotal).toDollar()}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {adAccount.dateArray.map((date, index) => {
+                      const filterDayCount =
+                        adAccount.dateArray.length -
+                        project.projectStartIndex -
                         1
-                      )}
-                    </td>
-                    <td>{format(adAccount.preLaunchSpendTotal).toDollar()}</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {adAccount.dateArray.map((date, index) => {
-                    const filterDayCount =
-                      adAccount.dateArray.length - project.projectStartIndex - 1
-                    if (index < filterDayCount) {
-                      return null
-                    }
-                    return (
-                      <tr key={`daily-adAccount-data-${index}`}>
-                        <th>{date}</th>
-                        <td>
-                          {format(adAccount.leadSpendDaily[index]).toDollar()}
-                        </td>
-                        <td>{format(adAccount.leadDaily[index]).toNumber()}</td>
-                        <td>
-                          {format(adAccount.costPerLeadDaily[index]).toDollar()}
-                        </td>
-                        <td>
-                          {format(
-                            adAccount.preLaunchSpendDaily[index]
-                          ).toDollar()}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+                      if (index < filterDayCount) {
+                        return null
+                      }
+                      return (
+                        <tr key={`daily-adAccount-data-${index}`}>
+                          <th>{date}</th>
+                          <td>
+                            {format(adAccount.leadSpendDaily[index]).toDollar()}
+                          </td>
+                          <td>
+                            {format(adAccount.leadDaily[index]).toNumber()}
+                          </td>
+                          <td>
+                            {format(
+                              adAccount.costPerLeadDaily[index]
+                            ).toDollar()}
+                          </td>
+                          <td className='table--hide-in-mobile'>
+                            {format(
+                              adAccount.preLaunchSpendDaily[index]
+                            ).toDollar()}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </>
       )}
-    </div>
+    </>
   )
 }
 

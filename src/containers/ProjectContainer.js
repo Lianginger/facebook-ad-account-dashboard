@@ -4,8 +4,33 @@ import './ProjectContainer.scss'
 
 const ProjectContainer = ({ project, adAccount }) => {
   const [countdown, setCountdown] = useState('')
+
+  const totalSpend = format(
+    adAccount.leadSpendTotal +
+      adAccount.preLaunchSpendTotal +
+      adAccount.fundRaisingSpendTotal
+  ).toDollar()
+  const costPerAverageLead = Number(
+    adAccount.leadSpendTotal / adAccount.leadTotal
+  ).toFixed(1)
+
   if (!project.id) {
-    return null
+    return (
+      <div className='project__ad-stats row'>
+        <div className='col-12 col-sm-4 ad-stats__list'>
+          <div className='ad-stats__key'>名單數</div>
+          <div className='ad-stats__value'>{adAccount.leadTotal}</div>
+        </div>
+        <div className='col-12 col-sm-4 ad-stats__list'>
+          <div className='ad-stats__key'>平均名單取得成本 CPL</div>
+          <div className='ad-stats__value'>{costPerAverageLead}</div>
+        </div>
+        <div className='col-12 col-sm-4 ad-stats__list'>
+          <div className='ad-stats__key'>總花費</div>
+          <div className='ad-stats__value'>{totalSpend}</div>
+        </div>
+      </div>
+    )
   }
 
   const fundingCurrentNumber = Number(
@@ -17,14 +42,7 @@ const ProjectContainer = ({ project, adAccount }) => {
   const goalPercentage = Math.floor(
     (fundingCurrentNumber / fundingTargetNumber) * 100
   )
-  const costPerAverageLead = Number(
-    adAccount.leadSpendTotal / adAccount.leadTotal
-  ).toFixed(1)
-  const totalSpend = format(
-    adAccount.leadSpendTotal +
-      adAccount.preLaunchSpendTotal +
-      adAccount.fundRaisingSpendTotal
-  ).toDollar()
+
   const totalSpendPerFundingCurrent =
     (adAccount.leadSpendTotal +
       adAccount.preLaunchSpendTotal +
