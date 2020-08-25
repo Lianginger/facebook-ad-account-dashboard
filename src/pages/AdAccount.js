@@ -10,6 +10,9 @@ import './AdAccount.scss'
 
 function AdAccount({ adAccountId }) {
   const [loading, setLoading] = useState(true)
+  const [isShowLeadStats, setIsShowLeadStats] = useState(true)
+  const [isShowFundRaisingStats, setIsShowFundRaisingStats] = useState(false)
+
   const [adAccount, setAdAccount] = useImmer({
     name: '',
     platformId: '',
@@ -527,6 +530,13 @@ function AdAccount({ adAccountId }) {
     setAdAccount,
   ])
 
+  useEffect(() => {
+    if (project.id) {
+      setIsShowLeadStats(false)
+      setIsShowFundRaisingStats(true)
+    }
+  }, [project.id])
+
   return (
     <>
       <div className='container my-3'>
@@ -545,8 +555,44 @@ function AdAccount({ adAccountId }) {
             <ProjectContainer project={project} adAccount={adAccount} />
           </div>
 
+          {/* 切換 tab */}
+          <div className='container'>
+            <div
+              className={`ad-stats-nav-tabs ${
+                isShowLeadStats ? 'ad-stats-nav-tabs--lead' : ''
+              } ${
+                isShowFundRaisingStats ? 'ad-stats-nav-tabs--fund-raising' : ''
+              }`}
+            >
+              <div
+                className={`tab__item tab__item--lead ${
+                  isShowLeadStats ? 'active' : ''
+                }`}
+                onClick={() => {
+                  setIsShowLeadStats(true)
+                  setIsShowFundRaisingStats(false)
+                }}
+              >
+                前測
+              </div>
+              {project.id && (
+                <div
+                  className={`tab__item tab__item--fund-raising ${
+                    isShowFundRaisingStats ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setIsShowLeadStats(false)
+                    setIsShowFundRaisingStats(true)
+                  }}
+                >
+                  上線
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* 集資廣告數據 */}
-          {project.id && (
+          {project.id && isShowFundRaisingStats && (
             <>
               <div className='container my-5' style={{ height: '300px' }}>
                 <Line
@@ -554,7 +600,7 @@ function AdAccount({ adAccountId }) {
                   options={fundRaisingLineChartOptions}
                 />
               </div>
-              <div className='adAccount__table adAccount__table--fundRaising'>
+              <div className='adAccount__table adAccount__table--fund-raising'>
                 <div className='adAccount__table-title'>每日數據</div>
                 <div className='container table-responsive'>
                   <div className='tableFixHead'>
@@ -645,72 +691,78 @@ function AdAccount({ adAccountId }) {
           )}
 
           {/* 前測廣告數據 */}
-          <div className='container my-5' style={{ height: '300px' }}>
-            <Line data={leadLineChartData} options={leadLineChartOptions} />
-          </div>
-          <div className='adAccount__table adAccount__table--lead'>
-            <div className='adAccount__table-title'>每日數據</div>
-            <div className='container table-responsive'>
-              <div className='tableFixHead'>
-                <table className='table'>
-                  <thead>
-                    <tr>
-                      <td>Date</td>
-                      <td>前測花費</td>
-                      <td>名單數</td>
-                      <td>CPL</td>
-                      <td className='table--hide-in-mobile'>預熱花費</td>
-                    </tr>
-                    <tr>
-                      <th>總計</th>
-                      <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
-                      <th>{format(adAccount.leadTotal).toNumber()}</th>
-                      <th>
-                        {(
-                          adAccount.leadSpendTotal / adAccount.leadTotal
-                        ).toFixed(1)}
-                      </th>
-                      <th className='table--hide-in-mobile'>
-                        {format(adAccount.preLaunchSpendTotal).toDollar()}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {adAccount.dateArray.map((date, index) => {
-                      const filterDayCount =
-                        adAccount.dateArray.length -
-                        project.projectStartIndex -
-                        1
-                      if (index < filterDayCount) {
-                        return null
-                      }
-                      return (
-                        <tr key={`daily-adAccount-data-${index}`}>
-                          <th>{date}</th>
-                          <td>
-                            {format(adAccount.leadSpendDaily[index]).toDollar()}
-                          </td>
-                          <td>
-                            {format(adAccount.leadDaily[index]).toNumber()}
-                          </td>
-                          <td>
-                            {format(
-                              adAccount.costPerLeadDaily[index]
-                            ).toDollar()}
-                          </td>
-                          <td className='table--hide-in-mobile'>
-                            {format(
-                              adAccount.preLaunchSpendDaily[index]
-                            ).toDollar()}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+          {isShowLeadStats && (
+            <>
+              <div className='container my-5' style={{ height: '300px' }}>
+                <Line data={leadLineChartData} options={leadLineChartOptions} />
               </div>
-            </div>
-          </div>
+              <div className='adAccount__table adAccount__table--lead'>
+                <div className='adAccount__table-title'>每日數據</div>
+                <div className='container table-responsive'>
+                  <div className='tableFixHead'>
+                    <table className='table'>
+                      <thead>
+                        <tr>
+                          <td>Date</td>
+                          <td>前測花費</td>
+                          <td>名單數</td>
+                          <td>CPL</td>
+                          <td className='table--hide-in-mobile'>預熱花費</td>
+                        </tr>
+                        <tr>
+                          <th>總計</th>
+                          <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
+                          <th>{format(adAccount.leadTotal).toNumber()}</th>
+                          <th>
+                            {(
+                              adAccount.leadSpendTotal / adAccount.leadTotal
+                            ).toFixed(1)}
+                          </th>
+                          <th className='table--hide-in-mobile'>
+                            {format(adAccount.preLaunchSpendTotal).toDollar()}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {adAccount.dateArray.map((date, index) => {
+                          const filterDayCount =
+                            adAccount.dateArray.length -
+                            project.projectStartIndex -
+                            1
+                          if (index < filterDayCount) {
+                            return null
+                          }
+                          return (
+                            <tr key={`daily-adAccount-data-${index}`}>
+                              <th>{date}</th>
+                              <td>
+                                {format(
+                                  adAccount.leadSpendDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td>
+                                {format(adAccount.leadDaily[index]).toNumber()}
+                              </td>
+                              <td>
+                                {format(
+                                  adAccount.costPerLeadDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td className='table--hide-in-mobile'>
+                                {format(
+                                  adAccount.preLaunchSpendDaily[index]
+                                ).toDollar()}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </>
