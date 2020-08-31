@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/facebook-ad-account-dashboard/static/css/main.61039bbe.chunk.css",
-    "main.js": "/facebook-ad-account-dashboard/static/js/main.66864818.chunk.js",
-    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.66864818.chunk.js.map",
+    "main.css": "/facebook-ad-account-dashboard/static/css/main.f2fcbf23.chunk.css",
+    "main.js": "/facebook-ad-account-dashboard/static/js/main.85d22258.chunk.js",
+    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.85d22258.chunk.js.map",
     "runtime-main.js": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js",
     "runtime-main.js.map": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js.map",
     "static/css/2.69121389.chunk.css": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css",
     "static/js/2.08f8f3e2.chunk.js": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js",
     "static/js/2.08f8f3e2.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js.map",
     "index.html": "/facebook-ad-account-dashboard/index.html",
-    "precache-manifest.15bd77ebc3f62c150558f5d449433b05.js": "/facebook-ad-account-dashboard/precache-manifest.15bd77ebc3f62c150558f5d449433b05.js",
+    "precache-manifest.7cc2831c6b3cd2d5cebfc5572c7598c7.js": "/facebook-ad-account-dashboard/precache-manifest.7cc2831c6b3cd2d5cebfc5572c7598c7.js",
     "service-worker.js": "/facebook-ad-account-dashboard/service-worker.js",
     "static/css/2.69121389.chunk.css.map": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css.map",
-    "static/css/main.61039bbe.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.61039bbe.chunk.css.map",
+    "static/css/main.f2fcbf23.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.f2fcbf23.chunk.css.map",
     "static/js/2.08f8f3e2.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.dba334fc.js",
     "static/css/2.69121389.chunk.css",
     "static/js/2.08f8f3e2.chunk.js",
-    "static/css/main.61039bbe.chunk.css",
-    "static/js/main.66864818.chunk.js"
+    "static/css/main.f2fcbf23.chunk.css",
+    "static/js/main.85d22258.chunk.js"
   ]
 }

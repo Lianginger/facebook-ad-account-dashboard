@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d0f4d35c0f7e981b04aa697b9fe5e024",
+    "revision": "b0e559d3bff6356d018a1553ff3f27c4",
     "url": "/facebook-ad-account-dashboard/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css"
   },
   {
-    "revision": "afd1d1b7699fe1a39ab9",
-    "url": "/facebook-ad-account-dashboard/static/css/main.61039bbe.chunk.css"
+    "revision": "31009f2478c58449bfa4",
+    "url": "/facebook-ad-account-dashboard/static/css/main.f2fcbf23.chunk.css"
   },
   {
     "revision": "b255a0021ebc8db771e3",
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "afd1d1b7699fe1a39ab9",
-    "url": "/facebook-ad-account-dashboard/static/js/main.66864818.chunk.js"
+    "revision": "31009f2478c58449bfa4",
+    "url": "/facebook-ad-account-dashboard/static/js/main.85d22258.chunk.js"
   },
   {
     "revision": "b58938b7ce639180c509",
