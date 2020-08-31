@@ -3,7 +3,7 @@ export function format(data) {
     toDollar() {
       return !data
         ? ''
-        : `NTD ${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+        : `$ ${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
     },
     toNumber() {
       return !data ? '' : data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')

@@ -39,10 +39,18 @@
   }
 }
 
+.line-chart {
+  display: none;
+  @media screen and (min-width: 768px) {
+    display: block;
+  }
+}
+
 .adAccount__table {
   background: #f8f8f8;
   font-size: 14px;
   position: relative;
+  margin-top: 3em;
   .container {
     padding: 0;
     padding-top: 40px;
@@ -95,6 +103,7 @@
     top: 0px;
     background-color: #f8f8f8;
     border-top: 0px;
+    white-space: normal;
   }
 
   .tableFixHead thead tr:nth-child(2) th {

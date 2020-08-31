@@ -594,7 +594,7 @@ function AdAccount({ adAccountId }) {
           {/* 集資廣告數據 */}
           {project.id && isShowFundRaisingStats && (
             <>
-              <div className='container my-5' style={{ height: '300px' }}>
+              <div className='container my-3 line-chart' style={{ height: '300px' }}>
                 <Line
                   data={fundRaisingLineChartData}
                   options={fundRaisingLineChartOptions}
@@ -658,7 +658,7 @@ function AdAccount({ adAccountId }) {
                           }
                           return (
                             <tr key={`daily-adAccount-data-${index}`}>
-                              <th>{date}</th>
+                              <th>{date.slice(5)}</th>
                               <td className='table--hide-in-mobile'>
                                 {format(
                                   adAccount.fundRaisingDaily[index]
@@ -693,7 +693,7 @@ function AdAccount({ adAccountId }) {
           {/* 前測廣告數據 */}
           {isShowLeadStats && (
             <>
-              <div className='container my-5' style={{ height: '300px' }}>
+              <div className='container my-3 line-chart' style={{ height: '300px' }}>
                 <Line data={leadLineChartData} options={leadLineChartOptions} />
               </div>
               <div className='adAccount__table adAccount__table--lead'>
@@ -734,7 +734,7 @@ function AdAccount({ adAccountId }) {
                           }
                           return (
                             <tr key={`daily-adAccount-data-${index}`}>
-                              <th>{date}</th>
+                              <th>{date.slice(5)}</th>
                               <td>
                                 {format(
                                   adAccount.leadSpendDaily[index]
