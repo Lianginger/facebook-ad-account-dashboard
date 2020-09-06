@@ -1,3 +1,5 @@
+@import '../styles/theme.scss';
+
 .ad-accounts__switch {
   position: absolute;
   top: 55px;
@@ -12,13 +14,13 @@
     font-size: 18px;
   }
   .badge-launch {
-    background-color: #ff48cc;
+    background-color: $launch;
   }
   .badge-pre-launch {
-    background-color: #84256a;
+    background-color: $lead;
   }
   .badge-lead {
-    background-color: #166bb9;
+    background-color: $lead;
   }
   .card-title {
     height: 60px;

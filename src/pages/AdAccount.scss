@@ -1,12 +1,14 @@
+@import '../styles/theme.scss';
+
 .ad-stats-nav-tabs {
   display: flex;
   justify-content: flex-end;
 
   &.ad-stats-nav-tabs--lead {
-    border-bottom: 1px solid #0b3760;
+    border-bottom: 1px solid $lead;
   }
   &.ad-stats-nav-tabs--fund-raising {
-    border-bottom: 1px solid #84256a;
+    border-bottom: 1px solid $launch-dark;
   }
 
   .tab__item {
@@ -21,16 +23,16 @@
     bottom: -1px;
 
     &.tab__item--lead {
-      border: 1px solid #0b3760;
-      color: #0b3760;
+      border: 1px solid $lead;
+      color: $lead;
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       &.active {
         border-bottom: 1px solid rgb(255, 255, 255);
       }
     }
     &.tab__item--fund-raising {
-      border: 1px solid #84256a;
-      color: #84256a;
+      border: 1px solid $launch-dark;
+      color: $launch-dark;
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       &.active {
         border-bottom: 1px solid rgb(255, 255, 255);
@@ -71,24 +73,24 @@
   }
   &.adAccount__table--fund-raising {
     .adAccount__table-title {
-      background-color: #84256a;
+      background-color: $launch-dark;
     }
     .container {
-      border-top: 1px solid #84256a;
+      border-top: 1px solid $launch-dark;
     }
     .tableFixHead thead tr:nth-child(2) th {
-      color: #84256a;
+      color: $launch-dark;
     }
   }
   &.adAccount__table--lead {
     .adAccount__table-title {
-      background-color: #0b3760;
+      background-color: $lead;
     }
     .container {
-      border-top: 1px solid #0b3760;
+      border-top: 1px solid $lead;
     }
     .tableFixHead thead tr:nth-child(2) th {
-      color: #0b3760;
+      color: $lead;
     }
   }
 

@@ -9,22 +9,27 @@
   }
 }
 
-.project__content {
-  .project__content-title {
-    margin-bottom: 7.8px;
-    font-size: 16px;
-    line-height: 20px;
-    a {
-      color: $primary;
+.project__ad-stats {
+  .ad-stats__list {
+    margin-bottom: 15px;
+    .ad-stats__key {
+      font-size: 16px;
+      line-height: 20px;
+      color: $launch-dark;
+      a {
+        color: $launch-dark;
+      }
+    }
+    .ad-stats__value {
+      font-size: 32px;
+      line-height: 40px;
+      letter-spacing: 0.05em;
+      color: $main;
     }
   }
-  .project__content-funding-current {
-    font-size: 36px;
-    line-height: 46px;
-    letter-spacing: 0.05em;
-    color: $main;
-    margin-bottom: 25px;
-  }
+}
+
+.project__content {
   .project__content-info {
     .project__content-info-list {
       line-height: 38px;
@@ -38,23 +43,6 @@
       .list__value {
         display: inline-block;
       }
-    }
-  }
-}
-
-.project__ad-stats {
-  .ad-stats__list {
-    margin-bottom: 15px;
-    .ad-stats__key {
-      font-size: 16px;
-      line-height: 20px;
-      color: $primary;
-    }
-    .ad-stats__value {
-      font-size: 32px;
-      line-height: 40px;
-      letter-spacing: 0.05em;
-      color: $main;
     }
   }
 }

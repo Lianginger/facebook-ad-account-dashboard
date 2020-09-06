@@ -75,11 +75,11 @@ function AdAccount({ adAccountId }) {
       {
         label: '總體 ROAS',
         fill: false,
-        borderColor: '#84256A',
-        pointBackgroundColor: '#84256A',
-        pointHoverBackgroundColor: '#84256A',
+        borderColor: '#1060AB',
+        pointBackgroundColor: '#1060AB',
+        pointHoverBackgroundColor: '#1060AB',
         datalabels: {
-          color: '#84256A',
+          color: '#1060AB',
           align: 'top',
           offset: 8,
         },
@@ -92,11 +92,11 @@ function AdAccount({ adAccountId }) {
       {
         label: '廣告 ROAS',
         fill: false,
-        borderColor: '#FF48CC',
-        pointBackgroundColor: '#FF48CC',
-        pointHoverBackgroundColor: '#FF48CC',
+        borderColor: '#1FA3EE',
+        pointBackgroundColor: '#1FA3EE',
+        pointHoverBackgroundColor: '#1FA3EE',
         datalabels: {
-          color: '#FF48CC',
+          color: '#1FA3EE',
           align: 'bottom',
           offset: 8,
         },
@@ -144,11 +144,11 @@ function AdAccount({ adAccountId }) {
       {
         label: 'CPL',
         fill: false,
-        borderColor: '#166BB9',
-        pointBackgroundColor: '#166BB9',
-        pointHoverBackgroundColor: '#166BB9',
+        borderColor: '#D07D00',
+        pointBackgroundColor: '#D07D00',
+        pointHoverBackgroundColor: '#D07D00',
         datalabels: {
-          color: '#166BB9',
+          color: '#D07D00',
           align: 'top',
           offset: 8,
         },
@@ -169,7 +169,7 @@ function AdAccount({ adAccountId }) {
           display: true,
           position: 'left',
           scaleLabel: {
-            fontColor: '#166BB9',
+            fontColor: '#D07D00',
             display: true,
             labelString: '名單取得成本',
           },
@@ -594,7 +594,10 @@ function AdAccount({ adAccountId }) {
           {/* 集資廣告數據 */}
           {project.id && isShowFundRaisingStats && (
             <>
-              <div className='container my-3 line-chart' style={{ height: '300px' }}>
+              <div
+                className='container my-3 line-chart'
+                style={{ height: '300px' }}
+              >
                 <Line
                   data={fundRaisingLineChartData}
                   options={fundRaisingLineChartOptions}
@@ -693,7 +696,10 @@ function AdAccount({ adAccountId }) {
           {/* 前測廣告數據 */}
           {isShowLeadStats && (
             <>
-              <div className='container my-3 line-chart' style={{ height: '300px' }}>
+              <div
+                className='container my-3 line-chart'
+                style={{ height: '300px' }}
+              >
                 <Line data={leadLineChartData} options={leadLineChartOptions} />
               </div>
               <div className='adAccount__table adAccount__table--lead'>

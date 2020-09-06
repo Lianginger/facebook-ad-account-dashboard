@@ -19,7 +19,9 @@ const ProjectContainer = ({ project, adAccount }) => {
       <div className='project__ad-stats row'>
         <div className='col-12 col-sm-4 ad-stats__list'>
           <div className='ad-stats__key'>名單數</div>
-          <div className='ad-stats__value'>{adAccount.leadTotal}</div>
+          <div className='ad-stats__value'>
+            {format(adAccount.leadTotal).toNumber()}
+          </div>
         </div>
         <div className='col-12 col-sm-4 ad-stats__list'>
           <div className='ad-stats__key'>平均名單取得成本 CPL</div>
@@ -34,10 +36,10 @@ const ProjectContainer = ({ project, adAccount }) => {
   }
 
   const fundingCurrentNumber = Number(
-    project.funding_current.replace(/NTD /g, '').replace(/,/g, '')
+    project.funding_current.replace(/\$ /g, '').replace(/,/g, '')
   )
   const fundingTargetNumber = Number(
-    project.funding_target.replace(/NTD /g, '').replace(/,/g, '')
+    project.funding_target.replace(/\$ /g, '').replace(/,/g, '')
   )
   const goalPercentage = Math.floor(
     (fundingCurrentNumber / fundingTargetNumber) * 100
