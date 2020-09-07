@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/facebook-ad-account-dashboard/static/css/main.0fe22147.chunk.css",
-    "main.js": "/facebook-ad-account-dashboard/static/js/main.399d2cd8.chunk.js",
-    "main.js.map": "/facebook-ad-account-dashboard/static/js/main.399d2cd8.chunk.js.map",
-    "runtime-main.js": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js",
-    "runtime-main.js.map": "/facebook-ad-account-dashboard/static/js/runtime-main.dba334fc.js.map",
-    "static/css/2.69121389.chunk.css": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css",
-    "static/js/2.08f8f3e2.chunk.js": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js",
-    "static/js/2.08f8f3e2.chunk.js.map": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js.map",
-    "index.html": "/facebook-ad-account-dashboard/index.html",
-    "precache-manifest.e3b90275af6b0c51b76a0ae34af0dff1.js": "/facebook-ad-account-dashboard/precache-manifest.e3b90275af6b0c51b76a0ae34af0dff1.js",
-    "service-worker.js": "/facebook-ad-account-dashboard/service-worker.js",
-    "static/css/2.69121389.chunk.css.map": "/facebook-ad-account-dashboard/static/css/2.69121389.chunk.css.map",
-    "static/css/main.0fe22147.chunk.css.map": "/facebook-ad-account-dashboard/static/css/main.0fe22147.chunk.css.map",
-    "static/js/2.08f8f3e2.chunk.js.LICENSE.txt": "/facebook-ad-account-dashboard/static/js/2.08f8f3e2.chunk.js.LICENSE.txt"
+    "main.css": "/static/css/main.0fe22147.chunk.css",
+    "main.js": "/static/js/main.f404e0f3.chunk.js",
+    "main.js.map": "/static/js/main.f404e0f3.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.2eb33ac7.js",
+    "runtime-main.js.map": "/static/js/runtime-main.2eb33ac7.js.map",
+    "static/css/2.69121389.chunk.css": "/static/css/2.69121389.chunk.css",
+    "static/js/2.c98fd03b.chunk.js": "/static/js/2.c98fd03b.chunk.js",
+    "static/js/2.c98fd03b.chunk.js.map": "/static/js/2.c98fd03b.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.eb6a55140273e444beac3e4dce010d26.js": "/precache-manifest.eb6a55140273e444beac3e4dce010d26.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/2.69121389.chunk.css.map": "/static/css/2.69121389.chunk.css.map",
+    "static/css/main.0fe22147.chunk.css.map": "/static/css/main.0fe22147.chunk.css.map",
+    "static/js/2.c98fd03b.chunk.js.LICENSE.txt": "/static/js/2.c98fd03b.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.dba334fc.js",
+    "static/js/runtime-main.2eb33ac7.js",
     "static/css/2.69121389.chunk.css",
-    "static/js/2.08f8f3e2.chunk.js",
+    "static/js/2.c98fd03b.chunk.js",
     "static/css/main.0fe22147.chunk.css",
-    "static/js/main.399d2cd8.chunk.js"
+    "static/js/main.f404e0f3.chunk.js"
   ]
 }
