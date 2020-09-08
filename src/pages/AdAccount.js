@@ -195,7 +195,7 @@ function AdAccount({ adAccountId }) {
     function fetchAdAccountInfo() {
       fetch(
         // `http://localhost:8000/ad-account/info/${adAccountId}`
-        `https://fb-ads-api.herokuapp.com/ad-account/info/${adAccountId}`
+        `https://syphon-api.zectrack.today/ad-account/info/${adAccountId}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -211,7 +211,7 @@ function AdAccount({ adAccountId }) {
       setLoading(true)
       fetch(
         // `http://localhost:8000/ad-account/insights/${adAccountId}`
-        `https://fb-ads-api.herokuapp.com/ad-account/insights/${adAccountId}`
+        `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}`
       )
         .then((res) => res.json())
         .then((res) => {

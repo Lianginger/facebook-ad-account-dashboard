@@ -71,7 +71,7 @@ const HeaderContainer = ({
         {!isHome && (
           <div
             className='header__back-to-home'
-            onClick={() => navigate('/facebook-ad-account-dashboard/')}
+            onClick={() => navigate('/')}
           >
             <SvgArrowLeft className='header__arrow-left' />
             <span className='header__back-to-home-text'>Home</span>

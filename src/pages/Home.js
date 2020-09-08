@@ -54,7 +54,7 @@ function Home({ adAccounts }) {
                     className='card-body'
                     onClick={() =>
                       navigate(
-                        `/facebook-ad-account-dashboard/ad-account/${id}`
+                        `/ad-account/${id}`
                       )
                     }
                   >
