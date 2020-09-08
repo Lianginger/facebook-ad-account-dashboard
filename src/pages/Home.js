@@ -22,7 +22,8 @@ function Home({ adAccounts }) {
     const params = new URL(document.location).searchParams
     const path = params.get('p')
     if (path) {
-      navigate(`/facebook-ad-account-dashboard${path}`)
+      console.log(666, path)
+      navigate(`${path}`)
     }
   }, [])
 
@@ -52,11 +53,7 @@ function Home({ adAccounts }) {
                 >
                   <div
                     className='card-body'
-                    onClick={() =>
-                      navigate(
-                        `/ad-account/${id}`
-                      )
-                    }
+                    onClick={() => navigate(`/ad-account/${id}`)}
                   >
                     <span
                       className={
