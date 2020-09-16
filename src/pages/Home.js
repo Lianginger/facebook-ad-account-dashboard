@@ -22,7 +22,6 @@ function Home({ adAccounts }) {
     const params = new URL(document.location).searchParams
     const path = params.get('p')
     if (path) {
-      console.log(666, path)
       navigate(`${path}`)
     }
   }, [])
