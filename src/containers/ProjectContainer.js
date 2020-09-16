@@ -52,7 +52,8 @@ const ProjectContainer = ({ project, adAccount }) => {
     fundingCurrentNumber
 
   const countdownInterval = setInterval(function () {
-    const countDownDate = new Date(project.finished_at).getTime()
+    const t = project.finished_at.split(/[- :]/)
+    const countDownDate = new Date(t[0], t[1]-1, t[2], t[3], t[4]).getTime()
     const now = new Date().getTime()
     const distance = countDownDate - now
 
