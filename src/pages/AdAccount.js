@@ -342,12 +342,12 @@ function AdAccount({ adAccountId }) {
           let totalRevenue = 0
 
           adCampaignArray.forEach((adCampaign) => {
-            if (parseInt(adCampaign.spend) === 0 || !adCampaign.action_values) {
+            if (parseInt(adCampaign.spend) === 0) {
               return
             }
 
             const adCampaignSpend = parseInt(adCampaign.spend)
-            const adCampaignOmniPurchaseAction = adCampaign.action_values.find(
+            const adCampaignOmniPurchaseAction = adCampaign.action_values && adCampaign.action_values.find(
               (action) => action.action_type === 'omni_purchase'
             )
             totalSpend += adCampaignSpend

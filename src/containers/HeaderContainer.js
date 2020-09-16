@@ -90,6 +90,7 @@ const HeaderContainer = ({
             <span className='sr-only'>Loading...</span>
           </div>
         )}
+        {user.isNoAuth && !user.isLoading ? <span className="text-danger">你沒有權限</span>:''}
         {/* Avatar、登出 */}
         {user.isLogin && !user.isLoading ? (
           <div className='text-right'>
@@ -125,9 +126,9 @@ const HeaderContainer = ({
             data-use-continue-as='true'
             data-width=''
             data-onlogin='checkLoginState();'
-            data-scope='public_profile,email,ads_read,business_management'
+            data-scope='public_profile,email,ads_read'
             style={{
-              display: user.isLogin || user.isLoading ? 'none' : 'block',
+              display: user.isLogin || user.isLoading || user.isNoAuth ? 'none' : 'block',
             }}
           ></div>
         </div>

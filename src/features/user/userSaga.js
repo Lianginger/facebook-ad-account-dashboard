@@ -18,17 +18,22 @@ export function* fetchUserAndAdAccountsAsyncSaga({ payload }) {
       })
     })
 
-    const userData = {
-      name: response.name,
-      pictureURL: response.picture.data.url,
-      isLogin: true,
+    if(response.error) {
+      yield put(setUser({isNoAuth: true}))
+      yield put(setAdAccounts({data: []}))
+    } else {
+      const userData = {
+        name: response.name,
+        pictureURL: response.picture.data.url,
+        isLogin: true,
+      }
+      const adAccounts = {
+        data: formatAdAccounts(response.adaccounts.data),
+      }
+  
+      yield put(setUser(userData))
+      yield put(setAdAccounts(adAccounts))
     }
-    const adAccounts = {
-      data: formatAdAccounts(response.adaccounts.data),
-    }
-
-    yield put(setUser(userData))
-    yield put(setAdAccounts(adAccounts))
 
     yield put(setUser({ isLoading: false }))
     yield put(setAdAccounts({ isLoading: false }))
