@@ -1,12 +1,12 @@
 export function format(data) {
   return {
     toDollar() {
-      return !data
+      return !data && data !== 0
         ? ''
         : `$ ${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
     },
     toNumber() {
-      return !data ? '' : data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return !data && data !== 0 ? '' : data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
     toProjectTime() {
       const [date, time] = data.split('T')

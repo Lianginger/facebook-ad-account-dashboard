@@ -235,7 +235,7 @@ function AdAccount({ adAccountId }) {
             : (dataMart[date][campaignType] = [data])
           : (dataMart[date] = { [campaignType]: [data] })
       })
-      // console.log('dataMart:', dataMart)
+      console.log('dataMart:', dataMart)
       return dataMart
     }
 
@@ -356,7 +356,7 @@ function AdAccount({ adAccountId }) {
               : 0
           })
 
-          if (totalSpend !== 0 && totalRevenue !== 0) {
+          if (totalSpend !== 0 ) {
             fundRaisingSpendTotal += totalSpend
             fundRaisingSpendDaily.push(totalSpend)
             adsDirectFundRaisingTotal += totalRevenue
