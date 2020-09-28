@@ -68,9 +68,12 @@ function AdAccount({ adAccountId }) {
   }
 
   const fundRaisingLineChartData = {
-    labels: project.projectStartIndex
-      ? [...adAccount.dateArray].reverse().slice(project.projectStartIndex)
-      : [],
+    labels:
+      project.projectStartIndex !== undefined
+        ? project.projectStartIndex === -1
+          ? [...adAccount.dateArray].reverse()
+          : [...adAccount.dateArray].reverse().slice(project.projectStartIndex)
+        : [],
     datasets: [
       {
         label: '總體 ROAS',
@@ -83,11 +86,14 @@ function AdAccount({ adAccountId }) {
           align: 'top',
           offset: 8,
         },
-        data: project.projectStartIndex
-          ? [...adAccount.totalRoasDaily]
-              .reverse()
-              .slice(project.projectStartIndex)
-          : [],
+        data:
+          project.projectStartIndex !== undefined
+            ? project.projectStartIndex === -1
+              ? [...adAccount.totalRoasDaily].reverse()
+              : [...adAccount.totalRoasDaily]
+                  .reverse()
+                  .slice(project.projectStartIndex)
+            : [],
       },
       {
         label: '廣告 ROAS',
@@ -100,11 +106,14 @@ function AdAccount({ adAccountId }) {
           align: 'bottom',
           offset: 8,
         },
-        data: project.projectStartIndex
-          ? [...adAccount.adsDirectRoasDaily]
-              .reverse()
-              .slice(project.projectStartIndex)
-          : [],
+        data:
+          project.projectStartIndex !== undefined
+            ? project.projectStartIndex === -1
+              ? [...adAccount.adsDirectRoasDaily].reverse()
+              : [...adAccount.adsDirectRoasDaily]
+                  .reverse()
+                  .slice(project.projectStartIndex)
+            : [],
       },
     ],
   }
@@ -347,16 +356,18 @@ function AdAccount({ adAccountId }) {
             }
 
             const adCampaignSpend = parseInt(adCampaign.spend)
-            const adCampaignOmniPurchaseAction = adCampaign.action_values && adCampaign.action_values.find(
-              (action) => action.action_type === 'omni_purchase'
-            )
+            const adCampaignOmniPurchaseAction =
+              adCampaign.action_values &&
+              adCampaign.action_values.find(
+                (action) => action.action_type === 'omni_purchase'
+              )
             totalSpend += adCampaignSpend
             totalRevenue += adCampaignOmniPurchaseAction
               ? parseInt(adCampaignOmniPurchaseAction.value)
               : 0
           })
 
-          if (totalSpend !== 0 ) {
+          if (totalSpend !== 0) {
             fundRaisingSpendTotal += totalSpend
             fundRaisingSpendDaily.push(totalSpend)
             adsDirectFundRaisingTotal += totalRevenue
@@ -735,6 +746,7 @@ function AdAccount({ adAccountId }) {
                             adAccount.dateArray.length -
                             project.projectStartIndex -
                             1
+
                           if (index < filterDayCount) {
                             return null
                           }
