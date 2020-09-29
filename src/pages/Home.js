@@ -71,7 +71,7 @@ function Home({ adAccounts }) {
 
                     <h5 className='card-title'>{name}</h5>
                     <p className='card-text'>
-                      總廣告花費：{format(amount_spent).toDollar()}
+                      {/* 總廣告花費：{format(amount_spent).toDollar()} */}
                     </p>
                   </div>
                 </div>

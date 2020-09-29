@@ -45,7 +45,7 @@ const HeaderContainer = ({
         appId: '2772453809519165',
         cookie: true,
         xfbml: true,
-        version: 'v6.0',
+        version: 'v7.0',
       })
 
       window.FB.AppEvents.logPageView()
@@ -69,10 +69,7 @@ const HeaderContainer = ({
     <header className='header'>
       <div className='header__line-left'>
         {!isHome && (
-          <div
-            className='header__back-to-home'
-            onClick={() => navigate('/')}
-          >
+          <div className='header__back-to-home' onClick={() => navigate('/')}>
             <SvgArrowLeft className='header__arrow-left' />
             <span className='header__back-to-home-text'>Home</span>
           </div>
@@ -90,7 +87,11 @@ const HeaderContainer = ({
             <span className='sr-only'>Loading...</span>
           </div>
         )}
-        {user.isNoAuth && !user.isLoading ? <span className="text-danger">你沒有權限</span>:''}
+        {user.isNoAuth && !user.isLoading ? (
+          <span className='text-danger'>你沒有權限</span>
+        ) : (
+          ''
+        )}
         {/* Avatar、登出 */}
         {user.isLogin && !user.isLoading ? (
           <div className='text-right'>
@@ -128,7 +129,10 @@ const HeaderContainer = ({
             data-onlogin='checkLoginState();'
             data-scope='public_profile,email,ads_read'
             style={{
-              display: user.isLogin || user.isLoading || user.isNoAuth ? 'none' : 'block',
+              display:
+                user.isLogin || user.isLoading || user.isNoAuth
+                  ? 'none'
+                  : 'block',
             }}
           ></div>
         </div>

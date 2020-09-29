@@ -244,7 +244,7 @@ function AdAccount({ adAccountId }) {
             : (dataMart[date][campaignType] = [data])
           : (dataMart[date] = { [campaignType]: [data] })
       })
-      console.log('dataMart:', dataMart)
+      // console.log('dataMart:', dataMart)
       return dataMart
     }
 
@@ -504,15 +504,18 @@ function AdAccount({ adAccountId }) {
 
       const totalRoasDaily = []
       adAccount.dateArray.forEach((date, index) => {
+        fundRaisingTotal += project.fundRaisingDateMap[date]
+          ? project.fundRaisingDateMap[date]
+          : 0
+        fundRaisingDaily.push(project.fundRaisingDateMap[date])
+        orderCountTotal += project.orderCountDateMap[date]
+          ? project.orderCountDateMap[date]
+          : 0
+        orderCountDaily.push(project.orderCountDateMap[date])
         if (
           project.fundRaisingDateMap[date] &&
-          project.orderCountDateMap[date] &&
           adAccount.fundRaisingSpendDaily[index]
         ) {
-          fundRaisingTotal += project.fundRaisingDateMap[date]
-          fundRaisingDaily.push(project.fundRaisingDateMap[date])
-          orderCountTotal += project.orderCountDateMap[date]
-          orderCountDaily.push(project.orderCountDateMap[date])
           totalRoasDaily.push(
             (
               project.fundRaisingDateMap[date] /
@@ -520,9 +523,7 @@ function AdAccount({ adAccountId }) {
             ).toFixed(1)
           )
         } else {
-          orderCountDaily.push(null)
-          fundRaisingDaily.push(null)
-          totalRoasDaily.push(null)
+          totalRoasDaily.push(0)
         }
       })
       setAdAccount((state) => {
