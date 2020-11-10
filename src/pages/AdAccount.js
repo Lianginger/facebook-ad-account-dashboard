@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useImmer } from 'use-immer'
 import { Line } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import { format } from '../utils/utils'
+import { format, debounce } from '../utils/utils'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
 import { HeaderContainer, ProjectContainer } from '../containers'
 
 import './AdAccount.scss'
 
-function AdAccount({ adAccountId }) {
+function AdAccount({ adAccountId, user }) {
   const [loading, setLoading] = useState(true)
   const [isShowLeadStats, setIsShowLeadStats] = useState(true)
   const [isShowFundRaisingStats, setIsShowFundRaisingStats] = useState(false)
@@ -46,6 +48,13 @@ function AdAccount({ adAccountId }) {
     fundRaisingDateMap: undefined,
     orderCountDateMap: undefined,
   })
+  const [comment, setComment] = useImmer({})
+  const updateCommentCallback = useCallback(
+    debounce((value, date) => {
+      updateComment(value, date)
+    }, 600),
+    [],
+  )
 
   const chartGlobalOptions = {
     maintainAspectRatio: false,
@@ -418,7 +427,7 @@ function AdAccount({ adAccountId }) {
 
     function fetchFundingData(platformId, projectId) {
       fetch(
-        `https://drip.zectrack.today/api/platform/${platformId}/projects/${projectId}`
+        `https://drip-plugin.crowdfunding.coffee/api/platform/${platformId}/projects/${projectId}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -477,6 +486,7 @@ function AdAccount({ adAccountId }) {
       fundingOfThePreviousDay = fundingToday
       orderOfThePreviousDay = orderToday
     }
+    // console.log(fundRaisingDateMap, orderCountDateMap)
 
     setProject((state) => {
       state.fundRaisingDateMap = fundRaisingDateMap
@@ -548,6 +558,20 @@ function AdAccount({ adAccountId }) {
       setIsShowFundRaisingStats(true)
     }
   }, [project.id])
+
+  // 取得備註資料
+  useEffect(() => {
+    fetch(`https://drip-plugin.crowdfunding.coffee/api/adAccountId/${adAccountId}/comment/`)
+      .then((res) => res.json())
+      .then((res) => {
+        const commentMap = {}
+        res.forEach(({ date, comment }) => {
+          commentMap[date] = comment
+        })
+
+        setComment((state) => commentMap)
+      })
+  }, [adAccountId])
 
   return (
     <>
@@ -631,6 +655,7 @@ function AdAccount({ adAccountId }) {
                           <td>廣告直接轉換金額</td>
                           <td>廣告直接 ROAS</td>
                           <td>總體 ROAS</td>
+                          {user.isLogin && <td>備註</td>}
                         </tr>
                         <tr>
                           <th>總計</th>
@@ -660,6 +685,7 @@ function AdAccount({ adAccountId }) {
                               adAccount.fundRaisingSpendTotal
                             ).toFixed(1)}
                           </th>
+                          {user.isLogin && <th></th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -671,6 +697,7 @@ function AdAccount({ adAccountId }) {
                           if (index > reserveDayCount) {
                             return null
                           }
+
                           return (
                             <tr key={`daily-adAccount-data-${index}`}>
                               <th>{date.slice(5)}</th>
@@ -694,6 +721,11 @@ function AdAccount({ adAccountId }) {
                               </td>
                               <td>{adAccount.adsDirectRoasDaily[index]}</td>
                               <td>{adAccount.totalRoasDaily[index]}</td>
+                              {user.isLogin && (
+                                <td style={{padding: "8px"}}>
+                                  <textarea value={comment[date]} className="form-control form-control-sm" rows="1" cols="20" data-date={date} onChange={handleCommentInputChange}/>
+                                </td>
+                              )}
                             </tr>
                           )
                         })}
@@ -786,6 +818,38 @@ function AdAccount({ adAccountId }) {
       )}
     </>
   )
+  
+
+  function handleCommentInputChange(event) {
+    const value = event.target.value
+    const date = event.target.dataset.date
+    setComment(state => ({
+      ...state,
+      [date]: value
+    }))
+    updateCommentCallback(value, date)
+  }
+
+  function updateComment(comment, date){
+    fetch(`https://drip-plugin.crowdfunding.coffee/api/comment/insert`, {
+      method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          adAccountId,
+          date,
+          comment
+        })
+
+    })
+  }
 }
 
-export default AdAccount
+const mapStateToProps = ({ user }) => ({
+  user,
+})
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch)
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdAccount)
