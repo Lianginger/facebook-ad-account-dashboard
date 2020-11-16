@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useImmer } from 'use-immer'
 import { Line } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import { format, debounce } from '../utils/utils'
+import { format, debounce, textareaAutoResize } from '../utils/utils'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
@@ -53,7 +53,7 @@ function AdAccount({ adAccountId, user }) {
     debounce((value, date) => {
       updateComment(value, date)
     }, 600),
-    [],
+    []
   )
 
   const chartGlobalOptions = {
@@ -561,7 +561,9 @@ function AdAccount({ adAccountId, user }) {
 
   // 取得備註資料
   useEffect(() => {
-    fetch(`https://drip-plugin.crowdfunding.coffee/api/adAccountId/${adAccountId}/comment/`)
+    fetch(
+      `https://drip-plugin.crowdfunding.coffee/api/adAccountId/${adAccountId}/comment/`
+    )
       .then((res) => res.json())
       .then((res) => {
         const commentMap = {}
@@ -572,6 +574,11 @@ function AdAccount({ adAccountId, user }) {
         setComment((state) => commentMap)
       })
   }, [adAccountId])
+
+  useEffect(() => {
+    console.log(666)
+    textareaAutoResize()
+  }, [user.isLogin, adAccount])
 
   return (
     <>
@@ -655,7 +662,9 @@ function AdAccount({ adAccountId, user }) {
                           <td>廣告直接轉換金額</td>
                           <td>廣告直接 ROAS</td>
                           <td>總體 ROAS</td>
-                          {user.isLogin && <td>備註</td>}
+                          {user.isLogin && (
+                            <td className='table--hide-in-mobile'>備註</td>
+                          )}
                         </tr>
                         <tr>
                           <th>總計</th>
@@ -685,7 +694,9 @@ function AdAccount({ adAccountId, user }) {
                               adAccount.fundRaisingSpendTotal
                             ).toFixed(1)}
                           </th>
-                          {user.isLogin && <th></th>}
+                          {user.isLogin && (
+                            <th className='table--hide-in-mobile'></th>
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -722,8 +733,19 @@ function AdAccount({ adAccountId, user }) {
                               <td>{adAccount.adsDirectRoasDaily[index]}</td>
                               <td>{adAccount.totalRoasDaily[index]}</td>
                               {user.isLogin && (
-                                <td style={{padding: "8px"}}>
-                                  <textarea value={comment[date]} className="form-control form-control-sm" rows="1" cols="20" data-date={date} onChange={handleCommentInputChange}/>
+                                <td
+                                  className='table--hide-in-mobile'
+                                  style={{ padding: '8px' }}
+                                >
+                                  <textarea
+                                    value={comment[date]}
+                                    className='form-control form-control-sm'
+                                    rows='1'
+                                    cols='20'
+                                    data-date={date}
+                                    style={{ overflowY: 'hidden' }}
+                                    onChange={handleCommentInputChange}
+                                  />
                                 </td>
                               )}
                             </tr>
@@ -758,6 +780,9 @@ function AdAccount({ adAccountId, user }) {
                           <td>名單數</td>
                           <td>CPL</td>
                           <td className='table--hide-in-mobile'>預熱花費</td>
+                          {user.isLogin && (
+                            <td className='table--hide-in-mobile'>備註</td>
+                          )}
                         </tr>
                         <tr>
                           <th>總計</th>
@@ -771,6 +796,9 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.preLaunchSpendTotal).toDollar()}
                           </th>
+                          {user.isLogin && (
+                            <th className='table--hide-in-mobile'></th>
+                          )}
                         </tr>
                       </thead>
                       <tbody>
@@ -804,6 +832,22 @@ function AdAccount({ adAccountId, user }) {
                                   adAccount.preLaunchSpendDaily[index]
                                 ).toDollar()}
                               </td>
+                              {user.isLogin && (
+                                <td
+                                  className='table--hide-in-mobile'
+                                  style={{ padding: '8px' }}
+                                >
+                                  <textarea
+                                    value={comment[date]}
+                                    className='form-control form-control-sm'
+                                    rows='1'
+                                    cols='20'
+                                    data-date={date}
+                                    style={{ overflowY: 'hidden' }}
+                                    onChange={handleCommentInputChange}
+                                  />
+                                </td>
+                              )}
                             </tr>
                           )
                         })}
@@ -818,30 +862,29 @@ function AdAccount({ adAccountId, user }) {
       )}
     </>
   )
-  
 
   function handleCommentInputChange(event) {
     const value = event.target.value
     const date = event.target.dataset.date
-    setComment(state => ({
+    // event.target.style.height = event.target.scrollHeight + 'px'
+    setComment((state) => ({
       ...state,
-      [date]: value
+      [date]: value,
     }))
     updateCommentCallback(value, date)
   }
 
-  function updateComment(comment, date){
+  function updateComment(comment, date) {
     fetch(`https://drip-plugin.crowdfunding.coffee/api/comment/insert`, {
       method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          adAccountId,
-          date,
-          comment
-        })
-
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        adAccountId,
+        date,
+        comment,
+      }),
     })
   }
 }

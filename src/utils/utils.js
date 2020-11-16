@@ -6,7 +6,9 @@ export function format(data) {
         : `$ ${data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
     },
     toNumber() {
-      return !data && data !== 0 ? '' : data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return !data && data !== 0
+        ? ''
+        : data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
     toProjectTime() {
       const [date, time] = data.split('T')
@@ -36,22 +38,38 @@ export function format(data) {
   }
 }
 
-export function debounce(func, wait, immediate){
+export function debounce(func, wait, immediate) {
   let timeout
-  return function() {
+  return function () {
     const context = this
     const args = arguments
-    const later = function() {
+    const later = function () {
       timeout = null
       if (!immediate) {
         func.apply(context, args)
       }
     }
-    const callNow = immediate && !timeout;
+    const callNow = immediate && !timeout
     clearTimeout(timeout)
     timeout = setTimeout(later, wait)
     if (callNow) {
       func.apply(context, args)
     }
+  }
+}
+
+export function textareaAutoResize() {
+  const tx = document.getElementsByTagName('textarea')
+  for (let i = 0; i < tx.length; i++) {
+    tx[i].setAttribute(
+      'style',
+      'height:' + tx[i].scrollHeight + 'px;overflow-y:hidden;'
+    )
+    tx[i].addEventListener('input', OnInput, false)
+  }
+
+  function OnInput() {
+    this.style.height = 'auto'
+    this.style.height = this.scrollHeight + 'px'
   }
 }
