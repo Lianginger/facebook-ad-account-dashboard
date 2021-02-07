@@ -43,6 +43,7 @@ function AdAccount({ adAccountId, user }) {
     orderCountDaily: [],
     totalRoasDaily: [],
   })
+  // console.log(adAccount.dateArray)
   const [project, setProject] = useImmer({
     started_at: undefined,
     fundRaisingDateMap: undefined,
@@ -576,7 +577,6 @@ function AdAccount({ adAccountId, user }) {
   }, [adAccountId])
 
   useEffect(() => {
-    console.log(666)
     textareaAutoResize()
   }, [user.isLogin, adAccount])
 

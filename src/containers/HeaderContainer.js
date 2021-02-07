@@ -45,7 +45,7 @@ const HeaderContainer = ({
         appId: '2772453809519165',
         cookie: true,
         xfbml: true,
-        version: 'v7.0',
+        version: 'v9.0',
       })
 
       window.FB.AppEvents.logPageView()
