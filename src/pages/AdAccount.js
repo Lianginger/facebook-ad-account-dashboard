@@ -329,7 +329,9 @@ function AdAccount({ adAccountId, user }) {
             const adCampaignLeadAction = adCampaign.actions.find(
               (action) =>
                 action.action_type === 'offsite_conversion.fb_pixel_custom' ||
-                action.action_type === 'lead'
+                (action.action_type === 'lead') |
+                  (action.action_type ===
+                    'offsite_conversion.fb_pixel_complete_registration')
             )
 
             totalSpend += adCampaignSpend
