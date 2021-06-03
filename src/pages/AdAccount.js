@@ -326,13 +326,22 @@ function AdAccount({ adAccountId, user }) {
             }
 
             const adCampaignSpend = parseInt(adCampaign.spend)
-            const adCampaignLeadAction = adCampaign.actions.find(
-              (action) =>
-                action.action_type === 'offsite_conversion.fb_pixel_custom' ||
-                (action.action_type === 'lead') |
-                  (action.action_type ===
-                    'offsite_conversion.fb_pixel_complete_registration')
-            )
+            const adCampaignLeadAction = adCampaign.actions.find((action) => {
+              if (
+                adCampaign.campaign_name.toLowerCase().includes('surveycake')
+              ) {
+                return action.action_type.startsWith(
+                  'offsite_conversion.custom.'
+                )
+              } else {
+                return (
+                  action.action_type === 'offsite_conversion.fb_pixel_custom' ||
+                  (action.action_type === 'lead') |
+                    (action.action_type ===
+                      'offsite_conversion.fb_pixel_complete_registration')
+                )
+              }
+            })
 
             totalSpend += adCampaignSpend
             totalLead += adCampaignLeadAction
