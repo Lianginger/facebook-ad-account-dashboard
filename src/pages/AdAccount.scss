@@ -1,5 +1,34 @@
 @import '../styles/theme.scss';
 
+.time-range.row {
+  padding: 0.5em;
+  border: 1px dashed #0a2240;
+  margin-bottom: 1em;
+  margin-right: 0px;
+  margin-left: 0px;
+  .time-range__title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 40px;
+    font-weight: bold;
+    color: $launch-dark;
+  }
+
+  .time-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    label {
+      margin: 0 1em 0 0;
+      font-size: 16px;
+      line-height: 40px;
+      color: $launch-dark;
+    }
+  }
+}
+
 .ad-stats-nav-tabs {
   display: flex;
   justify-content: flex-end;

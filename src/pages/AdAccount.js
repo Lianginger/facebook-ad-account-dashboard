@@ -15,6 +15,20 @@ function AdAccount({ adAccountId, user }) {
   const [isShowLeadStats, setIsShowLeadStats] = useState(true)
   const [isShowFundRaisingStats, setIsShowFundRaisingStats] = useState(false)
 
+  const timeZoneOffset = new Date().getTimezoneOffset() * 60 * 1000
+  const initialTimeRange90Days = 90 * 24 * 60 * 60 * 1000
+  const initialSinceTime =
+    new Date().getTime() - timeZoneOffset - initialTimeRange90Days
+  const initialUntilTime = new Date().getTime() - timeZoneOffset
+  const initialSinceDate = new Date(initialSinceTime)
+    .toISOString()
+    .split('T')[0]
+  const initialUntilDate = new Date(initialUntilTime)
+    .toISOString()
+    .split('T')[0]
+  const [timeRangeSince, setTimeRangeSince] = useState(initialSinceDate)
+  const [timeRangeUntil, setTimeRangeUntil] = useState(initialUntilDate)
+
   const [adAccount, setAdAccount] = useImmer({
     name: '',
     platformId: '',
@@ -208,6 +222,10 @@ function AdAccount({ adAccountId, user }) {
 
   // 取得廣告帳號資料、廣告數據資料
   useEffect(() => {
+    if (timeRangeSince >= timeRangeUntil) {
+      alert('開始時間必須小於結束時間')
+      return
+    }
     fetchAdAccountInfo()
     fetchAdAccountInsights()
 
@@ -229,8 +247,8 @@ function AdAccount({ adAccountId, user }) {
     function fetchAdAccountInsights() {
       setLoading(true)
       fetch(
-        // `http://localhost:8000/ad-account/insights/${adAccountId}`
-        `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}`
+        `http://localhost:8000/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
+        // `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -267,7 +285,7 @@ function AdAccount({ adAccountId, user }) {
         ? '上線'
         : 'none'
     }
-  }, [adAccountId, setAdAccount])
+  }, [adAccountId, setAdAccount, timeRangeSince, timeRangeUntil])
 
   // 處理廣告數據資料
   useEffect(() => {
@@ -604,6 +622,38 @@ function AdAccount({ adAccountId, user }) {
         </div>
       ) : (
         <>
+          {/* 起迄日期選擇器 */}
+          <div className='container'>
+            <div className='row time-range'>
+              <div className='col-sm-12 col-md-4 time-range__title'>
+                資料選取範圍
+              </div>
+              <div className='col-sm-6 col-md-4 time-picker'>
+                <label htmlFor='timeRangeSince'>開始時間</label>
+                <input
+                  id='timeRangeSince'
+                  type='date'
+                  value={timeRangeSince}
+                  max={initialUntilDate}
+                  onChange={(e) => {
+                    setTimeRangeSince(e.target.value)
+                  }}
+                />
+              </div>
+              <div className='col-sm-6 col-md-4 time-picker'>
+                <label htmlFor='timeRangeUntil'>結束時間</label>
+                <input
+                  id='timeRangeUntil'
+                  type='date'
+                  value={timeRangeUntil}
+                  max={initialUntilDate}
+                  onChange={(e) => {
+                    setTimeRangeUntil(e.target.value)
+                  }}
+                />
+              </div>
+            </div>
+          </div>
           {/* 集資資料 */}
           <div className='container'>
             <ProjectContainer project={project} adAccount={adAccount} />
