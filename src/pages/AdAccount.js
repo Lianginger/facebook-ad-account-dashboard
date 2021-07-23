@@ -858,7 +858,8 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.preLaunchSpendTotal).toDollar()}
                           </th>
-                          {user.isLogin && (
+                          {(user.isLogin ||
+                            adAccountId === 'act_318137636023754') && (
                             <th className='table--hide-in-mobile'></th>
                           )}
                         </tr>
@@ -894,7 +895,8 @@ function AdAccount({ adAccountId, user }) {
                                   adAccount.preLaunchSpendDaily[index]
                                 ).toDollar()}
                               </td>
-                              {user.isLogin && (
+                              {(user.isLogin ||
+                                adAccountId === 'act_318137636023754') && (
                                 <td
                                   className='table--hide-in-mobile'
                                   style={{ padding: '8px' }}
