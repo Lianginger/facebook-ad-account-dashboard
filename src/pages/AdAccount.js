@@ -247,8 +247,8 @@ function AdAccount({ adAccountId, user }) {
     function fetchAdAccountInsights() {
       setLoading(true)
       fetch(
-        `http://localhost:8000/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
-        // `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
+        // `http://localhost:8000/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
+        `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -841,7 +841,8 @@ function AdAccount({ adAccountId, user }) {
                           <td>名單數</td>
                           <td>CPL</td>
                           <td className='table--hide-in-mobile'>預熱花費</td>
-                          {user.isLogin && (
+                          {(user.isLogin ||
+                            adAccountId === 'act_318137636023754') && (
                             <td className='table--hide-in-mobile'>備註</td>
                           )}
                         </tr>
