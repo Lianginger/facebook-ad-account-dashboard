@@ -895,8 +895,7 @@ function AdAccount({ adAccountId, user }) {
                                   adAccount.preLaunchSpendDaily[index]
                                 ).toDollar()}
                               </td>
-                              {(user.isLogin ||
-                                adAccountId === 'act_318137636023754') && (
+                              {user.isLogin && (
                                 <td
                                   className='table--hide-in-mobile'
                                   style={{ padding: '8px' }}
