@@ -27,6 +27,12 @@
       color: $launch-dark;
     }
   }
+
+  .time-range__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 .ad-stats-nav-tabs {

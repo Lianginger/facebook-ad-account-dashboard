@@ -28,6 +28,7 @@ function AdAccount({ adAccountId, user }) {
     .split('T')[0]
   const [timeRangeSince, setTimeRangeSince] = useState(initialSinceDate)
   const [timeRangeUntil, setTimeRangeUntil] = useState(initialUntilDate)
+  const [numberOfReload, setNumberOfReload] = useState(1)
 
   const [adAccount, setAdAccount] = useImmer({
     name: '',
@@ -70,6 +71,8 @@ function AdAccount({ adAccountId, user }) {
     }, 600),
     []
   )
+
+  const [chatbot, setChatbot] = useImmer(false)
 
   const chartGlobalOptions = {
     maintainAspectRatio: false,
@@ -285,7 +288,7 @@ function AdAccount({ adAccountId, user }) {
         ? '上線'
         : 'none'
     }
-  }, [adAccountId, setAdAccount, timeRangeSince, timeRangeUntil])
+  }, [adAccountId, setAdAccount, numberOfReload])
 
   // 處理廣告數據資料
   useEffect(() => {
@@ -603,6 +606,30 @@ function AdAccount({ adAccountId, user }) {
 
         setComment((state) => commentMap)
       })
+    fetch(
+      `https://beans-logistics.crowdfunding.coffee/openapi/syphon.php?act=${adAccountId.slice(
+        4
+      )}`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.length > 0) {
+          const chatbotMap = {}
+          let chatbotTotal = 0
+          res.forEach(({ date_time, order_audience }) => {
+            chatbotTotal += order_audience
+            chatbotMap[format(date_time).toDate()] = order_audience
+          })
+
+          setChatbot((state) => chatbotMap)
+          setAdAccount((state) => {
+            state.chatbotTotal = chatbotTotal
+          })
+        }
+      })
+      .catch((res) => {
+        console.error(res)
+      })
   }, [adAccountId])
 
   useEffect(() => {
@@ -625,7 +652,7 @@ function AdAccount({ adAccountId, user }) {
           {/* 起迄日期選擇器 */}
           <div className='container'>
             <div className='row time-range'>
-              <div className='col-sm-12 col-md-4 time-range__title'>
+              <div className='col-sm-12 col-md-2 time-range__title'>
                 資料選取範圍
               </div>
               <div className='col-sm-6 col-md-4 time-picker'>
@@ -651,6 +678,16 @@ function AdAccount({ adAccountId, user }) {
                     setTimeRangeUntil(e.target.value)
                   }}
                 />
+              </div>
+              <div className='col-sm-12 col-md-2 time-range__button'>
+                <div
+                  className='btn btn-primary btn-block m-1'
+                  onClick={() => {
+                    setNumberOfReload((state) => state + 1)
+                  }}
+                >
+                  更新
+                </div>
               </div>
             </div>
           </div>
@@ -839,6 +876,14 @@ function AdAccount({ adAccountId, user }) {
                           <td>Date</td>
                           <td>前測花費</td>
                           <td>名單數</td>
+                          {chatbot && (
+                            <td className='table--hide-in-mobile'>Chatbot</td>
+                          )}
+                          {chatbot && (
+                            <td className='table--hide-in-mobile'>
+                              Chatbot 成本
+                            </td>
+                          )}
                           <td>CPL</td>
                           <td className='table--hide-in-mobile'>預熱花費</td>
                           {(user.isLogin ||
@@ -850,6 +895,19 @@ function AdAccount({ adAccountId, user }) {
                           <th>總計</th>
                           <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
                           <th>{format(adAccount.leadTotal).toNumber()}</th>
+                          {chatbot && (
+                            <th className='table--hide-in-mobile'>
+                              {format(adAccount.chatbotTotal).toNumber()}
+                            </th>
+                          )}
+                          {chatbot && (
+                            <th className='table--hide-in-mobile'>
+                              {(
+                                adAccount.leadSpendTotal /
+                                adAccount.chatbotTotal
+                              ).toFixed(1)}
+                            </th>
+                          )}
                           <th>
                             {(
                               adAccount.leadSpendTotal / adAccount.leadTotal
@@ -858,8 +916,7 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.preLaunchSpendTotal).toDollar()}
                           </th>
-                          {(user.isLogin ||
-                            adAccountId === 'act_318137636023754') && (
+                          {user.isLogin && (
                             <th className='table--hide-in-mobile'></th>
                           )}
                         </tr>
@@ -885,6 +942,21 @@ function AdAccount({ adAccountId, user }) {
                               <td>
                                 {format(adAccount.leadDaily[index]).toNumber()}
                               </td>
+                              {chatbot && (
+                                <td className='table--hide-in-mobile'>
+                                  {format(chatbot[date]).toNumber()}
+                                </td>
+                              )}
+                              {chatbot && chatbot[date] && (
+                                <td className='table--hide-in-mobile'>
+                                  {format(
+                                    (
+                                      adAccount.leadSpendDaily[index] /
+                                      chatbot[date]
+                                    ).toFixed(1)
+                                  ).toDollar()}
+                                </td>
+                              )}
                               <td>
                                 {format(
                                   adAccount.costPerLeadDaily[index]
