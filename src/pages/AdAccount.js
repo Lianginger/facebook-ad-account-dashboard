@@ -231,6 +231,7 @@ function AdAccount({ adAccountId, user }) {
     }
     fetchAdAccountInfo()
     fetchAdAccountInsights()
+    fetchChatbotData()
 
     function fetchAdAccountInfo() {
       fetch(
@@ -256,9 +257,16 @@ function AdAccount({ adAccountId, user }) {
         .then((res) => res.json())
         .then((res) => {
           // console.log(res)
-          setAdAccount((state) => {
-            state.data = formatDataMart(res.data)
-          })
+          if (res.data) {
+            setAdAccount((state) => {
+              state.data = formatDataMart(res.data)
+            })
+          } else {
+            setAdAccount((state) => {
+              state.data = {}
+            })
+          }
+
           setLoading(false)
         })
     }
@@ -287,6 +295,42 @@ function AdAccount({ adAccountId, user }) {
         : data.campaign_name.includes('上線')
         ? '上線'
         : 'none'
+    }
+
+    function fetchChatbotData() {
+      fetch(
+        `https://beans-logistics.crowdfunding.coffee/openapi/syphon.php?act=${adAccountId.slice(
+          4
+        )}&start=${timeRangeSince}&end=${timeRangeUntil}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.length > 0) {
+            const chatbotMap = {}
+            let chatbotTotal = 0
+            res.forEach(({ date_time, order_audience }) => {
+              chatbotTotal += order_audience
+              chatbotMap[format(date_time).toDate()] = order_audience
+            })
+            // console.log(chatbotMap)
+            setChatbot((state) => chatbotMap)
+            setAdAccount((state) => {
+              state.chatbotTotal = chatbotTotal
+            })
+          } else {
+            setChatbot((state) => false)
+            setAdAccount((state) => {
+              state.chatbotTotal = 0
+            })
+          }
+        })
+        .catch((res) => {
+          console.error(res)
+          setChatbot((state) => false)
+          setAdAccount((state) => {
+            state.chatbotTotal = 0
+          })
+        })
     }
   }, [adAccountId, setAdAccount, numberOfReload])
 
@@ -606,30 +650,6 @@ function AdAccount({ adAccountId, user }) {
 
         setComment((state) => commentMap)
       })
-    fetch(
-      `https://beans-logistics.crowdfunding.coffee/openapi/syphon.php?act=${adAccountId.slice(
-        4
-      )}`
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.length > 0) {
-          const chatbotMap = {}
-          let chatbotTotal = 0
-          res.forEach(({ date_time, order_audience }) => {
-            chatbotTotal += order_audience
-            chatbotMap[format(date_time).toDate()] = order_audience
-          })
-
-          setChatbot((state) => chatbotMap)
-          setAdAccount((state) => {
-            state.chatbotTotal = chatbotTotal
-          })
-        }
-      })
-      .catch((res) => {
-        console.error(res)
-      })
   }, [adAccountId])
 
   useEffect(() => {
@@ -876,15 +896,19 @@ function AdAccount({ adAccountId, user }) {
                           <td>Date</td>
                           <td>前測花費</td>
                           <td>名單數</td>
+                          <td>CPL</td>
                           {chatbot && (
                             <td className='table--hide-in-mobile'>Chatbot</td>
                           )}
                           {chatbot && (
-                            <td className='table--hide-in-mobile'>
-                              Chatbot 成本
+                            <td
+                              title='（chatbot/名單數）'
+                              className='table--hide-in-mobile'
+                            >
+                              訂閱率
                             </td>
                           )}
-                          <td>CPL</td>
+
                           <td className='table--hide-in-mobile'>預熱花費</td>
                           {(user.isLogin ||
                             adAccountId === 'act_318137636023754') && (
@@ -895,6 +919,11 @@ function AdAccount({ adAccountId, user }) {
                           <th>總計</th>
                           <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
                           <th>{format(adAccount.leadTotal).toNumber()}</th>
+                          <th>
+                            {(
+                              adAccount.leadSpendTotal / adAccount.leadTotal
+                            ).toFixed(1)}
+                          </th>
                           {chatbot && (
                             <th className='table--hide-in-mobile'>
                               {format(adAccount.chatbotTotal).toNumber()}
@@ -902,17 +931,13 @@ function AdAccount({ adAccountId, user }) {
                           )}
                           {chatbot && (
                             <th className='table--hide-in-mobile'>
-                              {(
-                                adAccount.leadSpendTotal /
-                                adAccount.chatbotTotal
-                              ).toFixed(1)}
+                              {format(
+                                (
+                                  adAccount.chatbotTotal / adAccount.leadTotal
+                                ).toFixed(3)
+                              ).toPercentage()}
                             </th>
                           )}
-                          <th>
-                            {(
-                              adAccount.leadSpendTotal / adAccount.leadTotal
-                            ).toFixed(1)}
-                          </th>
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.preLaunchSpendTotal).toDollar()}
                           </th>
@@ -942,6 +967,11 @@ function AdAccount({ adAccountId, user }) {
                               <td>
                                 {format(adAccount.leadDaily[index]).toNumber()}
                               </td>
+                              <td>
+                                {format(
+                                  adAccount.costPerLeadDaily[index]
+                                ).toDollar()}
+                              </td>
                               {chatbot && (
                                 <td className='table--hide-in-mobile'>
                                   {format(chatbot[date]).toNumber()}
@@ -951,17 +981,12 @@ function AdAccount({ adAccountId, user }) {
                                 <td className='table--hide-in-mobile'>
                                   {format(
                                     (
-                                      adAccount.leadSpendDaily[index] /
-                                      chatbot[date]
-                                    ).toFixed(1)
-                                  ).toDollar()}
+                                      chatbot[date] / adAccount.leadDaily[index]
+                                    ).toFixed(3)
+                                  ).toPercentage()}
                                 </td>
                               )}
-                              <td>
-                                {format(
-                                  adAccount.costPerLeadDaily[index]
-                                ).toDollar()}
-                              </td>
+
                               <td className='table--hide-in-mobile'>
                                 {format(
                                   adAccount.preLaunchSpendDaily[index]

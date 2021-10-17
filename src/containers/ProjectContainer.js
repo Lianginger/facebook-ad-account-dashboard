@@ -5,14 +5,10 @@ import './ProjectContainer.scss'
 const ProjectContainer = ({ project, adAccount }) => {
   const [countdown, setCountdown] = useState('')
 
-  const totalSpend = format(
-    adAccount.leadSpendTotal +
-      adAccount.preLaunchSpendTotal +
-      adAccount.fundRaisingSpendTotal
-  ).toDollar()
-  const costPerAverageLead = Number(
-    adAccount.leadSpendTotal / adAccount.leadTotal
-  ).toFixed(1)
+  const costPerAverageLead =
+    adAccount.leadTotal > 0
+      ? Number(adAccount.leadSpendTotal / adAccount.leadTotal).toFixed(1)
+      : '-'
 
   if (!project.id) {
     return (
@@ -29,7 +25,11 @@ const ProjectContainer = ({ project, adAccount }) => {
         </div>
         <div className='col-12 col-sm-4 ad-stats__list'>
           <div className='ad-stats__key'>總花費</div>
-          <div className='ad-stats__value'>{totalSpend}</div>
+          <div className='ad-stats__value'>
+            {format(
+              adAccount.leadSpendTotal + adAccount.preLaunchSpendTotal
+            ).toDollar()}
+          </div>
         </div>
       </div>
     )
@@ -45,15 +45,12 @@ const ProjectContainer = ({ project, adAccount }) => {
     (fundingCurrentNumber / fundingTargetNumber) * 100
   )
 
-  const totalSpendPerFundingCurrent =
-    (adAccount.leadSpendTotal +
-      adAccount.preLaunchSpendTotal +
-      adAccount.fundRaisingSpendTotal) /
-    fundingCurrentNumber
+  const fundRaisingSpendTotalPerFundingCurrent =
+    adAccount.fundRaisingSpendTotal / fundingCurrentNumber
 
   const countdownInterval = setInterval(function () {
     const t = project.finished_at.split(/[- :]/)
-    const countDownDate = new Date(t[0], t[1]-1, t[2], t[3], t[4]).getTime()
+    const countDownDate = new Date(t[0], t[1] - 1, t[2], t[3], t[4]).getTime()
     const now = new Date().getTime()
     const distance = countDownDate - now
 
@@ -73,10 +70,10 @@ const ProjectContainer = ({ project, adAccount }) => {
 
   return (
     <div className='row'>
-      <div className='col-12 col-sm-6 col-lg-4 project__image'>
+      <div className='col-12 col-sm-6 project__image'>
         <div style={{ backgroundImage: `url(${project.og_image})` }}></div>
       </div>
-      <div className='col-12 col-sm-6 col-lg-4 project__ad-stats row'>
+      <div className='col-12 col-sm-6 project__ad-stats row'>
         <div className='col-12 ad-stats__list'>
           <div className='ad-stats__key'>
             {/* TODO: 串接其他平台 */}
@@ -90,45 +87,61 @@ const ProjectContainer = ({ project, adAccount }) => {
           <div className='ad-stats__value'>{project.funding_current}</div>
         </div>
         <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>廣告花費</div>
-          <div className='ad-stats__value'>{totalSpend}</div>
+          <div className='ad-stats__key'>上線後廣告花費</div>
+          <div className='ad-stats__value'>
+            {format(adAccount.fundRaisingSpendTotal).toDollar()}
+          </div>
         </div>
         <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>廣告占比</div>
+          <div className='ad-stats__key'>上線後廣告占比</div>
           <div className='ad-stats__value'>
-            {format(totalSpendPerFundingCurrent).toPercentage()}
+            {format(fundRaisingSpendTotalPerFundingCurrent).toPercentage()}
           </div>
         </div>
       </div>
-      <div className='col-12 col-sm-6 col-lg-4 project__content'>
-        <div className='project__content-info'>
-          <div className='project__content-info-list'>
+      <div className='col-12 project__content'>
+        <div className='row project__content-info'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>目標</div>
             <div className='list__value'>{project.funding_target}</div>
           </div>
-          <div className='project__content-info-list'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>達成比例</div>
             <div className='list__value'>
               {format(goalPercentage).toNumber()}%
             </div>
           </div>
-          <div className='project__content-info-list'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>贊助人數</div>
             <div className='list__value'>{project.sponsor_count}</div>
           </div>
-          <div className='project__content-info-list'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>時程</div>
             <div className='list__value'>
               {project.started_at} ~ {project.finished_at}
             </div>
           </div>
-          <div className='project__content-info-list'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>倒數</div>
             <div className='list__value'>{countdown}</div>
           </div>
-          <div className='project__content-info-list'>
+          <div className='col-12 col-sm-6 project__content-info-list'>
+            <div className='list__key'>名單數</div>
+            <div className='list__value'>
+              {format(adAccount.leadTotal).toNumber()}
+            </div>
+          </div>
+          <div className='col-12 col-sm-6 project__content-info-list'>
             <div className='list__key'>平均 CPL</div>
             <div className='list__value'>{costPerAverageLead}</div>
+          </div>
+          <div className='col-12 col-sm-6 project__content-info-list'>
+            <div className='list__key'>前測/預熱總花費</div>
+            <div className='list__value'>
+              {format(adAccount.leadSpendTotal).toDollar()}
+              {' / '}
+              {format(adAccount.preLaunchSpendTotal).toDollar()}
+            </div>
           </div>
         </div>
       </div>
