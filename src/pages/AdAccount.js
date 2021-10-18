@@ -236,7 +236,7 @@ function AdAccount({ adAccountId, user }) {
     function fetchAdAccountInfo() {
       fetch(
         // `http://localhost:8000/ad-account/info/${adAccountId}`
-        `https://syphon-api.zectrack.today/ad-account/info/${adAccountId}`
+        `https://syphon-api.crowdfunding.coffee/ad-account/info/${adAccountId}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -252,7 +252,7 @@ function AdAccount({ adAccountId, user }) {
       setLoading(true)
       fetch(
         // `http://localhost:8000/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
-        `https://syphon-api.zectrack.today/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
+        `https://syphon-api.crowdfunding.coffee/ad-account/insights/${adAccountId}?timeRangeSince=${timeRangeSince}&timeRangeUntil=${timeRangeUntil}`
       )
         .then((res) => res.json())
         .then((res) => {
