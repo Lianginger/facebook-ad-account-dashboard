@@ -508,16 +508,21 @@ function AdAccount({ adAccountId, user }) {
       )
         .then((res) => res.json())
         .then((res) => {
-          setProject((state) => ({
-            ...state,
-            ...res,
-            timeline: JSON.parse(res.timeline).sort((a, b) => a[0] - b[0]),
-            sponsor_count: format(res.sponsor_count).toNumber(),
-            funding_target: format(res.funding_target).toDollar(),
-            funding_current: format(res.funding_current).toDollar(),
-            started_at: format(res.started_at).toProjectTime(),
-            finished_at: format(res.finished_at).toProjectTime(),
-          }))
+          setProject((state) => {
+            let timeline = JSON.parse(res.timeline)
+            const customize_timeline = JSON.parse(res.customize_timeline)
+            timeline.push(...customize_timeline)
+            return {
+              ...state,
+              ...res,
+              timeline: timeline.sort((a, b) => a[0] - b[0]),
+              sponsor_count: format(res.sponsor_count).toNumber(),
+              funding_target: format(res.funding_target).toDollar(),
+              funding_current: format(res.funding_current).toDollar(),
+              started_at: format(res.started_at).toProjectTime(),
+              finished_at: format(res.finished_at).toProjectTime(),
+            }
+          })
         })
     }
   }, [adAccount.platformId, adAccount.projectId, setProject])
