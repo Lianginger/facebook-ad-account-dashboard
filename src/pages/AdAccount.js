@@ -510,8 +510,12 @@ function AdAccount({ adAccountId, user }) {
         .then((res) => {
           setProject((state) => {
             let timeline = JSON.parse(res.timeline)
-            const customize_timeline = JSON.parse(res.customize_timeline)
-            timeline.push(...customize_timeline)
+
+            if (res.customize_timeline) {
+              const customize_timeline = JSON.parse(res.customize_timeline)
+              timeline.push(...customize_timeline)
+            }
+
             return {
               ...state,
               ...res,
