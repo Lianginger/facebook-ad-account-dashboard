@@ -986,11 +986,13 @@ function AdAccount({ adAccountId, user }) {
                                   {format(chatbot[date]).toNumber()}
                                 </td>
                               )}
-                              {chatbot && chatbot[date] && (
+                              {chatbot && (
                                 <td className='table--hide-in-mobile'>
                                   {format(
-                                    (
-                                      chatbot[date] / adAccount.leadDaily[index]
+                                    (chatbot[date]
+                                      ? chatbot[date] /
+                                        adAccount.leadDaily[index]
+                                      : 0
                                     ).toFixed(3)
                                   ).toPercentage()}
                                 </td>
