@@ -45,7 +45,7 @@ const HeaderContainer = ({
         appId: '2772453809519165',
         cookie: true,
         xfbml: true,
-        version: 'v11.0',
+        version: 'v12.0',
       })
 
       window.FB.AppEvents.logPageView()
@@ -60,7 +60,7 @@ const HeaderContainer = ({
       js = d.createElement(s)
       js.id = id
       js.src =
-        'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v11.0&appId=2772453809519165&autoLogAppEvents=1'
+        'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v12.0&appId=2772453809519165&autoLogAppEvents=1'
       fjs.parentNode.insertBefore(js, fjs)
     })(document, 'script', 'facebook-jssdk')
   }, [])
