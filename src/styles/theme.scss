@@ -4,8 +4,11 @@ $launch: #1fa3ee;
 $launch-dark: #1060ab;
 $lead: #d07d00;
 $lead-dark: #945000;
+$brew: #48bf53;
+$brew-dark: #11823b;
 
 @import url('https://fonts.googleapis.com/css2?family=Dosis:wght@500;700&display=swap');
 * {
-  font-family: "Dosis", "Helvetica Neue", "Helvetica,Arial","PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif;
+  font-family: 'Dosis', 'Helvetica Neue', 'Helvetica,Arial', 'PingFang TC',
+    'Heiti TC', 'Microsoft JhengHei', sans-serif;
 }

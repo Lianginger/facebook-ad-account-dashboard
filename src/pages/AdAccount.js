@@ -7,13 +7,17 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 
 import { HeaderContainer, ProjectContainer } from '../containers'
+import { useGoogleAnalytics } from '../hooks'
 
 import './AdAccount.scss'
 
 function AdAccount({ adAccountId, user }) {
   const [loading, setLoading] = useState(true)
-  const [isShowLeadStats, setIsShowLeadStats] = useState(true)
-  const [isShowFundRaisingStats, setIsShowFundRaisingStats] = useState(false)
+
+  const LEAD = 'lead'
+  const FUND_RAISING = 'fundRaising'
+  const BREW = 'brew'
+  const [tabTopic, setTabTopic] = useState(LEAD)
 
   const timeZoneOffset = new Date().getTimezoneOffset() * 60 * 1000
   const initialTimeRange90Days = 90 * 24 * 60 * 60 * 1000
@@ -73,6 +77,12 @@ function AdAccount({ adAccountId, user }) {
   )
 
   const [chatbot, setChatbot] = useImmer(false)
+  const [brew, setBrew] = useImmer({
+    isOpen: false,
+    totalOrderCount: 0,
+    totalOrderSum: 0,
+    orderStatsDaily: [],
+  })
 
   const chartGlobalOptions = {
     maintainAspectRatio: false,
@@ -223,6 +233,57 @@ function AdAccount({ adAccountId, user }) {
     },
   }
 
+  const initialGaViewIdMap = {}
+  initialGaViewIdMap[LEAD] = ''
+  initialGaViewIdMap[FUND_RAISING] = ''
+  const [gaViewIdMap, setGaViewIdMap] = useImmer(initialGaViewIdMap)
+  // console.log('gaViewIdMap', gaViewIdMap)
+
+  const leadGAReportRequests = [
+    {
+      viewId: gaViewIdMap[LEAD],
+      dateRanges: [
+        {
+          startDate: timeRangeSince,
+          endDate: timeRangeUntil,
+        },
+      ],
+      metrics: [
+        {
+          expression: 'ga:goalCompletionsAll',
+        },
+      ],
+      dimensions: [{ name: 'ga:date' }],
+    },
+  ]
+  const [fetchLeadGACount, setFetchLeadGACount] = useState(0)
+  const leadGAData = useGoogleAnalytics(leadGAReportRequests, fetchLeadGACount)
+  // console.log('leadGAData', leadGAData)
+
+  const fundRaisingGAReportRequests = [
+    {
+      viewId: gaViewIdMap[FUND_RAISING],
+      dateRanges: [
+        {
+          startDate: timeRangeSince,
+          endDate: timeRangeUntil,
+        },
+      ],
+      metrics: [
+        {
+          expression: 'ga:transactionRevenue',
+        },
+      ],
+      dimensions: [{ name: 'ga:date' }],
+    },
+  ]
+  const [fetchFundRaisingGACount, setFetchFundRaisingGACount] = useState(0)
+  const fundRaisingGAData = useGoogleAnalytics(
+    fundRaisingGAReportRequests,
+    fetchFundRaisingGACount
+  )
+  // console.log('fundRaisingGAData', fundRaisingGAData)
+
   // 取得廣告帳號資料、廣告數據資料
   useEffect(() => {
     if (timeRangeSince >= timeRangeUntil) {
@@ -232,6 +293,7 @@ function AdAccount({ adAccountId, user }) {
     fetchAdAccountInfo()
     fetchAdAccountInsights()
     fetchChatbotData()
+    fetchBrewData()
 
     function fetchAdAccountInfo() {
       fetch(
@@ -256,7 +318,7 @@ function AdAccount({ adAccountId, user }) {
       )
         .then((res) => res.json())
         .then((res) => {
-          // console.log(res)
+          console.log(res)
           if (res.data) {
             setAdAccount((state) => {
               state.data = formatDataMart(res.data)
@@ -283,7 +345,7 @@ function AdAccount({ adAccountId, user }) {
             : (dataMart[date][campaignType] = [data])
           : (dataMart[date] = { [campaignType]: [data] })
       })
-      // console.log('dataMart:', dataMart)
+      console.log('dataMart:', dataMart)
       return dataMart
     }
 
@@ -294,6 +356,8 @@ function AdAccount({ adAccountId, user }) {
         ? '前測'
         : data.campaign_name.includes('上線')
         ? '上線'
+        : data.campaign_name.toLowerCase().includes('brew')
+        ? 'BREW'
         : 'none'
     }
 
@@ -329,6 +393,47 @@ function AdAccount({ adAccountId, user }) {
           setChatbot((state) => false)
           setAdAccount((state) => {
             state.chatbotTotal = 0
+          })
+        })
+    }
+
+    function fetchBrewData() {
+      fetch(
+        `https://brew-logistics.crowdfunding.coffee/openapi/syphon_preorder.php?act=${adAccountId.slice(
+          4
+        )}&start=${timeRangeSince}&end=${timeRangeUntil}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.length > 0) {
+            const isOpen = true
+            let orderStatsDaily = []
+            let totalOrderCount = 0
+            let totalOrderSum = 0
+
+            res.forEach(({ date_time, order_sum, order_count }) => {
+              totalOrderSum += order_sum
+              totalOrderCount += order_count
+              orderStatsDaily.push({
+                date: format(date_time).toDate(),
+                orderSum: order_sum,
+                orderCount: order_count,
+              })
+            })
+            orderStatsDaily = orderStatsDaily.reverse()
+
+            setBrew((state) => ({
+              isOpen,
+              orderStatsDaily,
+              totalOrderCount,
+              totalOrderSum,
+            }))
+          }
+        })
+        .catch((res) => {
+          console.error(res)
+          setBrew((state) => {
+            state.isOpen = false
           })
         })
     }
@@ -640,8 +745,7 @@ function AdAccount({ adAccountId, user }) {
 
   useEffect(() => {
     if (project.id) {
-      setIsShowLeadStats(false)
-      setIsShowFundRaisingStats(true)
+      setTabTopic(FUND_RAISING)
     }
   }, [project.id])
 
@@ -664,6 +768,26 @@ function AdAccount({ adAccountId, user }) {
   useEffect(() => {
     textareaAutoResize()
   }, [user.isLogin, adAccount])
+
+  // 取得 GA ViewId
+  useEffect(() => {
+    fetch(
+      `https://drip-plugin.crowdfunding.coffee/api/adAccountId/${adAccountId}/ga-viewId`
+      // `http://localhost:3050/api/adAccountId/${adAccountId}/ga-viewId`
+    )
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.length > 0) {
+          res.forEach(({ topic, viewId }) => {
+            setGaViewIdMap((state) => {
+              state[topic] = viewId
+            })
+          })
+          setFetchLeadGACount((state) => state + 1)
+          setFetchFundRaisingGACount((state) => state + 1)
+        }
+      })
+  }, [])
 
   return (
     <>
@@ -720,27 +844,96 @@ function AdAccount({ adAccountId, user }) {
               </div>
             </div>
           </div>
+          {/* GA ViewId */}
+          {user.isLogin && (
+            <div className='container'>
+              <div className='row ga-view-id'>
+                <div className='col-sm-12 col-md-6 ga-view-id-group'>
+                  <label htmlFor='lead-ga-view-id'>
+                    前測問卷{' '}
+                    <a
+                      target='blank'
+                      href='https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics'
+                    >
+                      GA View ID
+                    </a>
+                  </label>
+                  <input
+                    id='lead-ga-view-id'
+                    value={gaViewIdMap[LEAD]}
+                    onChange={(event) => {
+                      event.persist()
+                      setGaViewIdMap((state) => {
+                        state[LEAD] = event.target.value
+                      })
+                    }}
+                  />
+                  <div
+                    className='btn btn-primary btn-sm'
+                    onClick={() => {
+                      updateGaViewId(LEAD, gaViewIdMap[LEAD])
+                      setFetchLeadGACount((state) => state + 1)
+                    }}
+                  >
+                    更新
+                  </div>
+                </div>
+                <div className='col-sm-12 col-md-6  ga-view-id-group'>
+                  <label htmlFor='fund-raising-ga-view-id'>
+                    嘖嘖{' '}
+                    <a
+                      target='blank'
+                      href='https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics'
+                    >
+                      GA View ID
+                    </a>
+                  </label>
+                  <input
+                    id='fund-raising-ga-view-id'
+                    value={gaViewIdMap[FUND_RAISING]}
+                    onChange={(event) => {
+                      event.persist()
+                      setGaViewIdMap((state) => {
+                        state[FUND_RAISING] = event.target.value
+                      })
+                    }}
+                  />
+                  <div
+                    className='btn btn-primary btn-sm'
+                    onClick={() => {
+                      updateGaViewId(FUND_RAISING, gaViewIdMap[FUND_RAISING])
+                      setFetchFundRaisingGACount((state) => state + 1)
+                    }}
+                  >
+                    更新
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {/* 集資資料 */}
           <div className='container'>
             <ProjectContainer project={project} adAccount={adAccount} />
           </div>
-
           {/* 切換 tab */}
           <div className='container'>
             <div
               className={`ad-stats-nav-tabs ${
-                isShowLeadStats ? 'ad-stats-nav-tabs--lead' : ''
-              } ${
-                isShowFundRaisingStats ? 'ad-stats-nav-tabs--fund-raising' : ''
+                tabTopic === LEAD
+                  ? 'ad-stats-nav-tabs--lead'
+                  : tabTopic === FUND_RAISING
+                  ? 'ad-stats-nav-tabs--fund-raising'
+                  : tabTopic === BREW
+                  ? 'ad-stats-nav-tabs--brew'
+                  : ''
               }`}
             >
               <div
                 className={`tab__item tab__item--lead ${
-                  isShowLeadStats ? 'active' : ''
+                  tabTopic === LEAD ? 'active' : ''
                 }`}
                 onClick={() => {
-                  setIsShowLeadStats(true)
-                  setIsShowFundRaisingStats(false)
+                  setTabTopic(LEAD)
                 }}
               >
                 前測
@@ -748,21 +941,31 @@ function AdAccount({ adAccountId, user }) {
               {project.id && (
                 <div
                   className={`tab__item tab__item--fund-raising ${
-                    isShowFundRaisingStats ? 'active' : ''
+                    tabTopic === FUND_RAISING ? 'active' : ''
                   }`}
                   onClick={() => {
-                    setIsShowLeadStats(false)
-                    setIsShowFundRaisingStats(true)
+                    setTabTopic(FUND_RAISING)
                   }}
                 >
                   上線
                 </div>
               )}
+              {brew.isOpen && (
+                <div
+                  className={`tab__item tab__item--brew ${
+                    tabTopic === BREW ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setTabTopic(BREW)
+                  }}
+                >
+                  Brew
+                </div>
+              )}
             </div>
           </div>
-
           {/* 集資廣告數據 */}
-          {project.id && isShowFundRaisingStats && (
+          {project.id && tabTopic === FUND_RAISING && (
             <>
               <div
                 className='container my-3 line-chart'
@@ -787,6 +990,7 @@ function AdAccount({ adAccountId, user }) {
                           <td className='table--hide-in-mobile'>每日訂單數</td>
                           <td>上線廣告花費</td>
                           <td>廣告直接轉換金額</td>
+                          {gaViewIdMap[FUND_RAISING] && <td>GA 收益</td>}
                           <td>廣告直接 ROAS</td>
                           <td>總體 ROAS</td>
                           {user.isLogin && (
@@ -801,14 +1005,19 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.orderCountTotal).toNumber()}
                           </th>
-                          <th>
-                            {format(adAccount.fundRaisingSpendTotal).toDollar()}
-                          </th>
+                          {gaViewIdMap[FUND_RAISING] && (
+                            <th>
+                              {format(
+                                adAccount.fundRaisingSpendTotal
+                              ).toDollar()}
+                            </th>
+                          )}
                           <th>
                             {format(
                               adAccount.adsDirectFundRaisingTotal
                             ).toDollar()}
                           </th>
+                          <th>{format(fundRaisingGAData.total).toDollar()}</th>
                           <th>
                             {(
                               adAccount.adsDirectFundRaisingTotal /
@@ -847,15 +1056,20 @@ function AdAccount({ adAccountId, user }) {
                               <td className='table--hide-in-mobile'>
                                 {adAccount.orderCountDaily[index]}
                               </td>
-                              <td>
-                                {format(
-                                  adAccount.fundRaisingSpendDaily[index]
-                                ).toDollar()}
-                              </td>
+                              {gaViewIdMap[FUND_RAISING] && (
+                                <td>
+                                  {format(
+                                    adAccount.fundRaisingSpendDaily[index]
+                                  ).toDollar()}
+                                </td>
+                              )}
                               <td>
                                 {format(
                                   adAccount.adsDirectFundRaisingDaily[index]
                                 ).toDollar()}
+                              </td>
+                              <td>
+                                {format(fundRaisingGAData[date]).toDollar()}
                               </td>
                               <td>{adAccount.adsDirectRoasDaily[index]}</td>
                               <td>{adAccount.totalRoasDaily[index]}</td>
@@ -885,9 +1099,8 @@ function AdAccount({ adAccountId, user }) {
               </div>
             </>
           )}
-
           {/* 前測廣告數據 */}
-          {isShowLeadStats && (
+          {tabTopic === LEAD && (
             <>
               <div
                 className='container my-3 line-chart'
@@ -904,7 +1117,8 @@ function AdAccount({ adAccountId, user }) {
                         <tr>
                           <td>Date</td>
                           <td>前測花費</td>
-                          <td>名單數</td>
+                          <td>名單數(FB)</td>
+                          {gaViewIdMap[LEAD] && <td>名單數(GA)</td>}
                           <td>CPL</td>
                           {chatbot && (
                             <td className='table--hide-in-mobile'>Chatbot</td>
@@ -928,6 +1142,9 @@ function AdAccount({ adAccountId, user }) {
                           <th>總計</th>
                           <th>{format(adAccount.leadSpendTotal).toDollar()}</th>
                           <th>{format(adAccount.leadTotal).toNumber()}</th>
+                          {gaViewIdMap[LEAD] && (
+                            <th>{format(leadGAData.total).toNumber()}</th>
+                          )}
                           <th>
                             {(
                               adAccount.leadSpendTotal / adAccount.leadTotal
@@ -976,6 +1193,9 @@ function AdAccount({ adAccountId, user }) {
                               <td>
                                 {format(adAccount.leadDaily[index]).toNumber()}
                               </td>
+                              {gaViewIdMap[LEAD] && (
+                                <td>{format(leadGAData[date]).toNumber()}</td>
+                              )}
                               <td>
                                 {format(
                                   adAccount.costPerLeadDaily[index]
@@ -1029,6 +1249,122 @@ function AdAccount({ adAccountId, user }) {
               </div>
             </>
           )}
+          {/* Brew 廣告數據 */}
+          {tabTopic === BREW && (
+            <>
+              {/* <div
+                className='container my-3 line-chart'
+                style={{ height: '300px' }}
+              >
+                <Line
+                  data={fundRaisingLineChartData}
+                  options={fundRaisingLineChartOptions}
+                />
+              </div> */}
+              <div className='adAccount__table adAccount__table--brew'>
+                <div className='adAccount__table-title'>每日數據</div>
+                <div className='container table-responsive'>
+                  <div className='tableFixHead'>
+                    <table className='table'>
+                      <thead>
+                        <tr>
+                          <td>Date</td>
+                          <td className='table--hide-in-mobile'>
+                            每日集資金額
+                          </td>
+                          <td className='table--hide-in-mobile'>每日訂單數</td>
+                          {/* <td>上線廣告花費</td>
+                          <td>廣告直接轉換金額</td>
+                          <td>廣告直接 ROAS</td>
+                          <td>總體 ROAS</td> */}
+                          {user.isLogin && (
+                            <td className='table--hide-in-mobile'>備註</td>
+                          )}
+                        </tr>
+                        <tr>
+                          <th>總計</th>
+                          <th className='table--hide-in-mobile'>
+                            {format(brew.totalOrderSum).toDollar()}
+                          </th>
+                          <th className='table--hide-in-mobile'>
+                            {format(brew.totalOrderCount).toNumber()}
+                          </th>
+                          {/* <th>
+                            {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                          </th>
+                          <th>
+                            {format(
+                              adAccount.adsDirectFundRaisingTotal
+                            ).toDollar()}
+                          </th>
+                          <th>
+                            {(
+                              adAccount.adsDirectFundRaisingTotal /
+                              adAccount.fundRaisingSpendTotal
+                            ).toFixed(1)}
+                          </th>
+                          <th>
+                            {(
+                              adAccount.fundRaisingTotal /
+                              adAccount.fundRaisingSpendTotal
+                            ).toFixed(1)}
+                          </th> */}
+                          {user.isLogin && (
+                            <th className='table--hide-in-mobile'></th>
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {brew.orderStatsDaily.map(
+                          ({ date, orderSum, orderCount }) => {
+                            return (
+                              <tr key={`daily-adAccount-data-${date}`}>
+                                <th>{date.slice(5)}</th>
+                                <td className='table--hide-in-mobile'>
+                                  {format(orderSum).toDollar()}
+                                </td>
+                                <td className='table--hide-in-mobile'>
+                                  {orderCount}
+                                </td>
+                                {/* <td>
+                                {format(
+                                  adAccount.fundRaisingSpendDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td>
+                                {format(
+                                  adAccount.adsDirectFundRaisingDaily[index]
+                                ).toDollar()}
+                              </td>
+                              <td>{adAccount.adsDirectRoasDaily[index]}</td>
+                              <td>{adAccount.totalRoasDaily[index]}</td> */}
+                                {user.isLogin && (
+                                  <td
+                                    className='table--hide-in-mobile'
+                                    style={{ padding: '8px' }}
+                                  >
+                                    <textarea
+                                      value={comment[date]}
+                                      className='form-control form-control-sm'
+                                      rows='1'
+                                      cols='20'
+                                      data-date={date}
+                                      style={{ overflowY: 'hidden' }}
+                                      onChange={handleCommentInputChange}
+                                    />
+                                  </td>
+                                )}
+                              </tr>
+                            )
+                          }
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </>
       )}
     </>
@@ -1057,6 +1393,24 @@ function AdAccount({ adAccountId, user }) {
         comment,
       }),
     })
+  }
+
+  function updateGaViewId(topic, viewId) {
+    fetch(
+      `https://drip-plugin.crowdfunding.coffee/api/ga-viewId/create-or-update`,
+      // `http://localhost:3050/api/ga-viewId/create-or-update`
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          adAccountId,
+          topic,
+          viewId,
+        }),
+      }
+    )
   }
 }
 

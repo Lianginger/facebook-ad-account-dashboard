@@ -35,6 +35,25 @@
   }
 }
 
+.ga-view-id.row {
+  margin-right: 0px;
+  margin-left: 0px;
+  .ga-view-id-group {
+    margin-bottom: 1em;
+    padding: 0.5em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px dashed #0a2240;
+    label {
+      margin: 0 0;
+    }
+    input {
+      width: 90px;
+    }
+  }
+}
+
 .ad-stats-nav-tabs {
   display: flex;
   justify-content: flex-end;
@@ -44,6 +63,9 @@
   }
   &.ad-stats-nav-tabs--fund-raising {
     border-bottom: 1px solid $launch-dark;
+  }
+  &.ad-stats-nav-tabs--brew {
+    border-bottom: 1px solid $brew;
   }
 
   .tab__item {
@@ -68,6 +90,14 @@
     &.tab__item--fund-raising {
       border: 1px solid $launch-dark;
       color: $launch-dark;
+      border-bottom: 1px solid rgba(255, 255, 255, 0);
+      &.active {
+        border-bottom: 1px solid rgb(255, 255, 255);
+      }
+    }
+    &.tab__item--brew {
+      border: 1px solid $brew;
+      color: $brew;
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       &.active {
         border-bottom: 1px solid rgb(255, 255, 255);
@@ -126,6 +156,17 @@
     }
     .tableFixHead thead tr:nth-child(2) th {
       color: $lead;
+    }
+  }
+  &.adAccount__table--brew {
+    .adAccount__table-title {
+      background-color: $brew;
+    }
+    .container {
+      border-top: 1px solid $brew;
+    }
+    .tableFixHead thead tr:nth-child(2) th {
+      color: $brew;
     }
   }
 
