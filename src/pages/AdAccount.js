@@ -1005,19 +1005,21 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(adAccount.orderCountTotal).toNumber()}
                           </th>
-                          {gaViewIdMap[FUND_RAISING] && (
-                            <th>
-                              {format(
-                                adAccount.fundRaisingSpendTotal
-                              ).toDollar()}
-                            </th>
-                          )}
+
+                          <th>
+                            {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                          </th>
+
                           <th>
                             {format(
                               adAccount.adsDirectFundRaisingTotal
                             ).toDollar()}
                           </th>
-                          <th>{format(fundRaisingGAData.total).toDollar()}</th>
+                          {gaViewIdMap[FUND_RAISING] && (
+                            <th>
+                              {format(fundRaisingGAData.total).toDollar()}
+                            </th>
+                          )}
                           <th>
                             {(
                               adAccount.adsDirectFundRaisingTotal /
@@ -1056,21 +1058,21 @@ function AdAccount({ adAccountId, user }) {
                               <td className='table--hide-in-mobile'>
                                 {adAccount.orderCountDaily[index]}
                               </td>
-                              {gaViewIdMap[FUND_RAISING] && (
-                                <td>
-                                  {format(
-                                    adAccount.fundRaisingSpendDaily[index]
-                                  ).toDollar()}
-                                </td>
-                              )}
+                              <td>
+                                {format(
+                                  adAccount.fundRaisingSpendDaily[index]
+                                ).toDollar()}
+                              </td>
                               <td>
                                 {format(
                                   adAccount.adsDirectFundRaisingDaily[index]
                                 ).toDollar()}
                               </td>
-                              <td>
-                                {format(fundRaisingGAData[date]).toDollar()}
-                              </td>
+                              {gaViewIdMap[FUND_RAISING] && (
+                                <td>
+                                  {format(fundRaisingGAData[date]).toDollar()}
+                                </td>
+                              )}
                               <td>{adAccount.adsDirectRoasDaily[index]}</td>
                               <td>{adAccount.totalRoasDaily[index]}</td>
                               {user.isLogin && (
