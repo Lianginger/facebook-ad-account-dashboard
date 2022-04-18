@@ -1121,7 +1121,11 @@ function AdAccount({ adAccountId, user }) {
                           <td>前測花費</td>
                           <td>名單數(FB)</td>
                           {gaViewIdMap[LEAD] && <td>名單數(GA)</td>}
-                          <td>CPL</td>
+                          <td>
+                            <abbr title='取 FB or GA 名單數較高者計算'>
+                              CPL
+                            </abbr>
+                          </td>
                           {chatbot && (
                             <td className='table--hide-in-mobile'>Chatbot</td>
                           )}
@@ -1149,7 +1153,11 @@ function AdAccount({ adAccountId, user }) {
                           )}
                           <th>
                             {(
-                              adAccount.leadSpendTotal / adAccount.leadTotal
+                              adAccount.leadSpendTotal /
+                              Math.max(
+                                adAccount.leadTotal,
+                                leadGAData.total || 0
+                              )
                             ).toFixed(1)}
                           </th>
                           {chatbot && (
@@ -1200,7 +1208,13 @@ function AdAccount({ adAccountId, user }) {
                               )}
                               <td>
                                 {format(
-                                  adAccount.costPerLeadDaily[index]
+                                  (
+                                    adAccount.leadSpendDaily[index] /
+                                    Math.max(
+                                      adAccount.leadDaily[index],
+                                      leadGAData[date] || 0
+                                    )
+                                  ).toFixed(1)
                                 ).toDollar()}
                               </td>
                               {chatbot && (
