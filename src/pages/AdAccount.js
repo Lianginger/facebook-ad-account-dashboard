@@ -1122,7 +1122,7 @@ function AdAccount({ adAccountId, user }) {
                           <td>名單數(FB)</td>
                           {gaViewIdMap[LEAD] && <td>名單數(GA)</td>}
                           <td>
-                            <abbr title='取 FB or GA 名單數較高者計算'>
+                            <abbr title='分母以 GA 名單優先，沒有 GA 資料再用 FB 名單數'>
                               CPL
                             </abbr>
                           </td>
@@ -1152,13 +1152,13 @@ function AdAccount({ adAccountId, user }) {
                             <th>{format(leadGAData.total).toNumber()}</th>
                           )}
                           <th>
-                            {(
-                              adAccount.leadSpendTotal /
-                              Math.max(
-                                adAccount.leadTotal,
-                                leadGAData.total || 0
-                              )
-                            ).toFixed(1)}
+                            {gaViewIdMap[LEAD] && leadGAData.total
+                              ? (
+                                  adAccount.leadSpendTotal / leadGAData.total
+                                ).toFixed(1)
+                              : (
+                                  adAccount.leadSpendTotal / adAccount.leadTotal
+                                ).toFixed(1)}
                           </th>
                           {chatbot && (
                             <th className='table--hide-in-mobile'>
@@ -1207,15 +1207,16 @@ function AdAccount({ adAccountId, user }) {
                                 <td>{format(leadGAData[date]).toNumber()}</td>
                               )}
                               <td>
-                                {format(
-                                  (
-                                    adAccount.leadSpendDaily[index] /
-                                    Math.max(
-                                      adAccount.leadDaily[index],
-                                      leadGAData[date] || 0
-                                    )
-                                  ).toFixed(1)
-                                ).toDollar()}
+                                {gaViewIdMap[LEAD] && leadGAData.total
+                                  ? format(
+                                      (
+                                        adAccount.leadSpendDaily[index] /
+                                        leadGAData[date]
+                                      ).toFixed(1)
+                                    ).toDollar()
+                                  : format(
+                                      adAccount.costPerLeadDaily[index]
+                                    ).toDollar()}
                               </td>
                               {chatbot && (
                                 <td className='table--hide-in-mobile'>
