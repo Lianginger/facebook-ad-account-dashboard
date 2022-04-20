@@ -61,6 +61,8 @@ function AdAccount({ adAccountId, user }) {
     orderCountTotal: 0,
     orderCountDaily: [],
     totalRoasDaily: [],
+
+    brewData: {},
   })
   // console.log(adAccount.dateArray)
   const [project, setProject] = useImmer({
@@ -344,6 +346,8 @@ function AdAccount({ adAccountId, user }) {
             ? dataMart[date][campaignType].push(data)
             : (dataMart[date][campaignType] = [data])
           : (dataMart[date] = { [campaignType]: [data] })
+
+        dataMart[date].date = date
       })
       console.log('dataMart:', dataMart)
       return dataMart
@@ -461,6 +465,11 @@ function AdAccount({ adAccountId, user }) {
       let adsDirectFundRaisingDaily = []
       let adsDirectRoasDaily = []
 
+      let brewData = {
+        brewAdsSpendTotal: 0,
+        brewAdsRevenueTotal: 0,
+      }
+
       Object.values(adAccount.data).forEach((dateData) => {
         if (dateData['預熱']) {
           const adCampaignArray = dateData['預熱']
@@ -574,9 +583,40 @@ function AdAccount({ adAccountId, user }) {
           adsDirectFundRaisingDaily.push(null)
           adsDirectRoasDaily.push(null)
         }
+
+        if (dateData['BREW']) {
+          const adCampaignArray = dateData['BREW']
+          let totalSpend = 0
+          let totalRevenue = 0
+
+          adCampaignArray.forEach((adCampaign) => {
+            if (parseInt(adCampaign.spend) === 0) {
+              return
+            }
+
+            const adCampaignSpend = parseInt(adCampaign.spend)
+            const adCampaignOmniPurchaseAction =
+              adCampaign.action_values &&
+              adCampaign.action_values.find(
+                (action) => action.action_type === 'omni_purchase'
+              )
+            totalSpend += adCampaignSpend
+            totalRevenue += adCampaignOmniPurchaseAction
+              ? parseInt(adCampaignOmniPurchaseAction.value)
+              : 0
+          })
+
+          brewData[dateData.date] = {
+            spend: totalSpend,
+            revenue: totalRevenue,
+          }
+          brewData.brewAdsSpendTotal += totalSpend
+          brewData.brewAdsRevenueTotal += totalRevenue
+        }
       })
 
       // console.log(adAccount.data, leadSpendDaily, costPerLeadDaily)
+      console.log('brewData', brewData)
 
       setAdAccount((state) => {
         state.dateArray = dateArray
@@ -595,6 +635,8 @@ function AdAccount({ adAccountId, user }) {
         state.adsDirectFundRaisingTotal = adsDirectFundRaisingTotal
         state.adsDirectFundRaisingDaily = adsDirectFundRaisingDaily
         state.adsDirectRoasDaily = adsDirectRoasDaily
+
+        state.brewData = brewData
       })
     }
   }, [adAccount.data, setAdAccount])
@@ -1290,10 +1332,10 @@ function AdAccount({ adAccountId, user }) {
                             每日集資金額
                           </td>
                           <td className='table--hide-in-mobile'>每日訂單數</td>
-                          {/* <td>上線廣告花費</td>
+                          <td>上線廣告花費</td>
                           <td>廣告直接轉換金額</td>
                           <td>廣告直接 ROAS</td>
-                          <td>總體 ROAS</td> */}
+                          <td>總體 ROAS</td>
                           {user.isLogin && (
                             <td className='table--hide-in-mobile'>備註</td>
                           )}
@@ -1306,26 +1348,28 @@ function AdAccount({ adAccountId, user }) {
                           <th className='table--hide-in-mobile'>
                             {format(brew.totalOrderCount).toNumber()}
                           </th>
-                          {/* <th>
-                            {format(adAccount.fundRaisingSpendTotal).toDollar()}
+                          <th>
+                            {format(
+                              adAccount.brewData.brewAdsSpendTotal
+                            ).toDollar()}
                           </th>
                           <th>
                             {format(
-                              adAccount.adsDirectFundRaisingTotal
+                              adAccount.brewData.brewAdsRevenueTotal
                             ).toDollar()}
                           </th>
                           <th>
                             {(
-                              adAccount.adsDirectFundRaisingTotal /
-                              adAccount.fundRaisingSpendTotal
+                              adAccount.brewData.brewAdsRevenueTotal /
+                              adAccount.brewData.brewAdsSpendTotal
                             ).toFixed(1)}
                           </th>
                           <th>
                             {(
-                              adAccount.fundRaisingTotal /
-                              adAccount.fundRaisingSpendTotal
+                              brew.totalOrderSum /
+                              adAccount.brewData.brewAdsSpendTotal
                             ).toFixed(1)}
-                          </th> */}
+                          </th>
                           {user.isLogin && (
                             <th className='table--hide-in-mobile'></th>
                           )}
@@ -1343,18 +1387,27 @@ function AdAccount({ adAccountId, user }) {
                                 <td className='table--hide-in-mobile'>
                                   {orderCount}
                                 </td>
-                                {/* <td>
-                                {format(
-                                  adAccount.fundRaisingSpendDaily[index]
-                                ).toDollar()}
-                              </td>
-                              <td>
-                                {format(
-                                  adAccount.adsDirectFundRaisingDaily[index]
-                                ).toDollar()}
-                              </td>
-                              <td>{adAccount.adsDirectRoasDaily[index]}</td>
-                              <td>{adAccount.totalRoasDaily[index]}</td> */}
+                                <td>
+                                  {format(
+                                    adAccount.brewData[date]?.spend
+                                  ).toDollar()}
+                                </td>
+                                <td>
+                                  {format(
+                                    adAccount.brewData[date]?.revenue
+                                  ).toDollar()}
+                                </td>
+                                <td>
+                                  {(
+                                    adAccount.brewData[date]?.revenue /
+                                    adAccount.brewData[date]?.spend
+                                  ).toFixed(1)}
+                                </td>
+                                <td>
+                                  {(
+                                    orderSum / adAccount.brewData[date]?.spend
+                                  ).toFixed(1)}
+                                </td>
                                 {user.isLogin && (
                                   <td
                                     className='table--hide-in-mobile'
