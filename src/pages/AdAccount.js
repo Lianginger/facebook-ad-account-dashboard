@@ -62,7 +62,9 @@ function AdAccount({ adAccountId, user }) {
     orderCountDaily: [],
     totalRoasDaily: [],
 
-    brewData: {},
+    brewData: {
+      adsDirectRoasDaily: [],
+    },
   })
   // console.log(adAccount.dateArray)
   const [project, setProject] = useImmer({
@@ -84,6 +86,8 @@ function AdAccount({ adAccountId, user }) {
     totalOrderCount: 0,
     totalOrderSum: 0,
     orderStatsDaily: [],
+    dateArray: [],
+    dateToOrderSum: {},
   })
 
   const chartGlobalOptions = {
@@ -190,7 +194,7 @@ function AdAccount({ adAccountId, user }) {
       : [...adAccount.dateArray].reverse(),
     datasets: [
       {
-        label: 'CPL',
+        label: 'CPL(FB)',
         fill: false,
         borderColor: '#D07D00',
         pointBackgroundColor: '#D07D00',
@@ -208,6 +212,7 @@ function AdAccount({ adAccountId, user }) {
       },
     ],
   }
+
   const leadLineChartOptions = {
     ...chartGlobalOptions,
     scales: {
@@ -220,6 +225,86 @@ function AdAccount({ adAccountId, user }) {
             fontColor: '#D07D00',
             display: true,
             labelString: '名單取得成本',
+          },
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            callback: function (value, index, values) {
+              return value.slice(5)
+            },
+          },
+        },
+      ],
+    },
+  }
+
+  const brewLineChartData = {
+    labels: [...brew.dateArray],
+    datasets: [],
+  }
+
+  if (brew.isOpen && adAccount.brewData.brewAdsSpendTotal) {
+    const brewTotalRoasDaily = []
+    const brewAdsDirectRoasDaily = []
+    brew.dateArray.forEach((date) => {
+      if (adAccount.brewData[date]?.spend === 0) {
+        brewTotalRoasDaily.push(null)
+        brewAdsDirectRoasDaily.push(null)
+        return
+      }
+      brewTotalRoasDaily.push(
+        (brew.dateToOrderSum[date] / adAccount.brewData[date]?.spend).toFixed(1)
+      )
+      brewAdsDirectRoasDaily.push(
+        (
+          adAccount.brewData[date]?.revenue / adAccount.brewData[date]?.spend
+        ).toFixed(1)
+      )
+    })
+    brewLineChartData.datasets.push(
+      {
+        label: '總體 ROAS',
+        fill: false,
+        borderColor: '#21912a',
+        pointBackgroundColor: '#21912a',
+        pointHoverBackgroundColor: '#21912a',
+        datalabels: {
+          color: '#21912a',
+          align: 'top',
+          offset: 8,
+        },
+        data: brewTotalRoasDaily,
+      },
+      {
+        label: '廣告 ROAS',
+        fill: false,
+        borderColor: '#48bf53',
+        pointBackgroundColor: '#48bf53',
+        pointHoverBackgroundColor: '#48bf53',
+        datalabels: {
+          color: '#48bf53',
+          align: 'bottom',
+          offset: 8,
+        },
+        data: brewAdsDirectRoasDaily,
+      }
+    )
+  }
+
+  const brewLineChartOptions = {
+    ...chartGlobalOptions,
+    scales: {
+      yAxes: [
+        {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          scaleLabel: {
+            fontColor: '#48bf53',
+            display: true,
+            labelString: 'ROAS',
           },
         },
       ],
@@ -261,6 +346,41 @@ function AdAccount({ adAccountId, user }) {
   const [fetchLeadGACount, setFetchLeadGACount] = useState(0)
   const leadGAData = useGoogleAnalytics(leadGAReportRequests, fetchLeadGACount)
   // console.log('leadGAData', leadGAData)
+
+  if (
+    gaViewIdMap[LEAD] &&
+    leadGAData.total &&
+    adAccount.leadSpendDaily.length
+  ) {
+    let costPerGALeadDaily = []
+    adAccount.dateArray.map((date, index) => {
+      if (leadGAData[date]) {
+        costPerGALeadDaily.push(
+          (adAccount.leadSpendDaily[index] / leadGAData[date]).toFixed(1)
+        )
+      } else {
+        costPerGALeadDaily.push(null)
+      }
+    })
+
+    leadLineChartData.datasets.push({
+      label: 'CPL(GA)',
+      fill: false,
+      borderColor: '#f9af0b',
+      pointBackgroundColor: '#f9af0b',
+      pointHoverBackgroundColor: '#f9af0b',
+      datalabels: {
+        color: '#f9af0b',
+        align: 'top',
+        offset: 8,
+      },
+      data: project.projectStartIndex
+        ? [...costPerGALeadDaily]
+            .reverse()
+            .slice(0, project.projectStartIndex + 1)
+        : [...costPerGALeadDaily].reverse(),
+    })
+  }
 
   const fundRaisingGAReportRequests = [
     {
@@ -414,6 +534,8 @@ function AdAccount({ adAccountId, user }) {
             let orderStatsDaily = []
             let totalOrderCount = 0
             let totalOrderSum = 0
+            let dateArray = []
+            let dateToOrderSum = {}
 
             res.forEach(({ date_time, order_sum, order_count }) => {
               totalOrderSum += order_sum
@@ -423,6 +545,9 @@ function AdAccount({ adAccountId, user }) {
                 orderSum: order_sum,
                 orderCount: order_count,
               })
+
+              dateArray.push(format(date_time).toDate())
+              dateToOrderSum[format(date_time).toDate()] = order_sum
             })
             orderStatsDaily = orderStatsDaily.reverse()
 
@@ -431,6 +556,8 @@ function AdAccount({ adAccountId, user }) {
               orderStatsDaily,
               totalOrderCount,
               totalOrderSum,
+              dateArray,
+              dateToOrderSum,
             }))
           }
         })
@@ -616,7 +743,7 @@ function AdAccount({ adAccountId, user }) {
       })
 
       // console.log(adAccount.data, leadSpendDaily, costPerLeadDaily)
-      console.log('brewData', brewData)
+      // console.log('brewData', brewData)
 
       setAdAccount((state) => {
         state.dateArray = dateArray
@@ -833,28 +960,28 @@ function AdAccount({ adAccountId, user }) {
 
   return (
     <>
-      <div className='container my-3'>
+      <div className="container my-3">
         <HeaderContainer title={adAccount.name} />
       </div>
       {loading ? (
-        <div className='text-center my-5'>
-          <div className='spinner-border text-primary' role='status'>
-            <span className='sr-only'>Loading...</span>
+        <div className="text-center my-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="sr-only">Loading...</span>
           </div>
         </div>
       ) : (
         <>
           {/* 起迄日期選擇器 */}
-          <div className='container'>
-            <div className='row time-range'>
-              <div className='col-sm-12 col-md-2 time-range__title'>
+          <div className="container">
+            <div className="row time-range">
+              <div className="col-sm-12 col-md-2 time-range__title">
                 資料選取範圍
               </div>
-              <div className='col-sm-6 col-md-4 time-picker'>
-                <label htmlFor='timeRangeSince'>開始時間</label>
+              <div className="col-sm-6 col-md-4 time-picker">
+                <label htmlFor="timeRangeSince">開始時間</label>
                 <input
-                  id='timeRangeSince'
-                  type='date'
+                  id="timeRangeSince"
+                  type="date"
                   value={timeRangeSince}
                   max={initialUntilDate}
                   onChange={(e) => {
@@ -862,11 +989,11 @@ function AdAccount({ adAccountId, user }) {
                   }}
                 />
               </div>
-              <div className='col-sm-6 col-md-4 time-picker'>
-                <label htmlFor='timeRangeUntil'>結束時間</label>
+              <div className="col-sm-6 col-md-4 time-picker">
+                <label htmlFor="timeRangeUntil">結束時間</label>
                 <input
-                  id='timeRangeUntil'
-                  type='date'
+                  id="timeRangeUntil"
+                  type="date"
                   value={timeRangeUntil}
                   max={initialUntilDate}
                   onChange={(e) => {
@@ -874,9 +1001,9 @@ function AdAccount({ adAccountId, user }) {
                   }}
                 />
               </div>
-              <div className='col-sm-12 col-md-2 time-range__button'>
+              <div className="col-sm-12 col-md-2 time-range__button">
                 <div
-                  className='btn btn-primary btn-block m-1'
+                  className="btn btn-primary btn-block m-1"
                   onClick={() => {
                     setNumberOfReload((state) => state + 1)
                   }}
@@ -887,21 +1014,21 @@ function AdAccount({ adAccountId, user }) {
             </div>
           </div>
           {/* GA ViewId */}
-          {user.isLogin && (
-            <div className='container'>
-              <div className='row ga-view-id'>
-                <div className='col-sm-12 col-md-6 ga-view-id-group'>
-                  <label htmlFor='lead-ga-view-id'>
+          {
+            <div className="container">
+              <div className="row ga-view-id">
+                <div className="col-sm-12 col-md-6 ga-view-id-group">
+                  <label htmlFor="lead-ga-view-id">
                     前測問卷{' '}
                     <a
-                      target='blank'
-                      href='https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics'
+                      target="blank"
+                      href="https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics"
                     >
                       GA View ID
                     </a>
                   </label>
                   <input
-                    id='lead-ga-view-id'
+                    id="lead-ga-view-id"
                     value={gaViewIdMap[LEAD]}
                     onChange={(event) => {
                       event.persist()
@@ -909,9 +1036,10 @@ function AdAccount({ adAccountId, user }) {
                         state[LEAD] = event.target.value
                       })
                     }}
+                    disabled={!user.isLogin}
                   />
                   <div
-                    className='btn btn-primary btn-sm'
+                    className="btn btn-primary btn-sm"
                     onClick={() => {
                       updateGaViewId(LEAD, gaViewIdMap[LEAD])
                       setFetchLeadGACount((state) => state + 1)
@@ -920,18 +1048,18 @@ function AdAccount({ adAccountId, user }) {
                     更新
                   </div>
                 </div>
-                <div className='col-sm-12 col-md-6  ga-view-id-group'>
-                  <label htmlFor='fund-raising-ga-view-id'>
+                <div className="col-sm-12 col-md-6  ga-view-id-group">
+                  <label htmlFor="fund-raising-ga-view-id">
                     嘖嘖{' '}
                     <a
-                      target='blank'
-                      href='https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics'
+                      target="blank"
+                      href="https://keyword-hero.com/documentation/finding-your-view-id-in-google-analytics"
                     >
                       GA View ID
                     </a>
                   </label>
                   <input
-                    id='fund-raising-ga-view-id'
+                    id="fund-raising-ga-view-id"
                     value={gaViewIdMap[FUND_RAISING]}
                     onChange={(event) => {
                       event.persist()
@@ -939,9 +1067,10 @@ function AdAccount({ adAccountId, user }) {
                         state[FUND_RAISING] = event.target.value
                       })
                     }}
+                    disabled={!user.isLogin}
                   />
                   <div
-                    className='btn btn-primary btn-sm'
+                    className="btn btn-primary btn-sm"
                     onClick={() => {
                       updateGaViewId(FUND_RAISING, gaViewIdMap[FUND_RAISING])
                       setFetchFundRaisingGACount((state) => state + 1)
@@ -952,13 +1081,13 @@ function AdAccount({ adAccountId, user }) {
                 </div>
               </div>
             </div>
-          )}
+          }
           {/* 集資資料 */}
-          <div className='container'>
+          <div className="container">
             <ProjectContainer project={project} adAccount={adAccount} />
           </div>
           {/* 切換 tab */}
-          <div className='container'>
+          <div className="container">
             <div
               className={`ad-stats-nav-tabs ${
                 tabTopic === LEAD
@@ -1010,7 +1139,7 @@ function AdAccount({ adAccountId, user }) {
           {project.id && tabTopic === FUND_RAISING && (
             <>
               <div
-                className='container my-3 line-chart'
+                className="container my-3 line-chart"
                 style={{ height: '300px' }}
               >
                 <Line
@@ -1018,33 +1147,33 @@ function AdAccount({ adAccountId, user }) {
                   options={fundRaisingLineChartOptions}
                 />
               </div>
-              <div className='adAccount__table adAccount__table--fund-raising'>
-                <div className='adAccount__table-title'>每日數據</div>
-                <div className='container table-responsive'>
-                  <div className='tableFixHead'>
-                    <table className='table'>
+              <div className="adAccount__table adAccount__table--fund-raising">
+                <div className="adAccount__table-title">每日數據</div>
+                <div className="container table-responsive">
+                  <div className="tableFixHead">
+                    <table className="table">
                       <thead>
                         <tr>
                           <td>Date</td>
-                          <td className='table--hide-in-mobile'>
+                          <td className="table--hide-in-mobile">
                             每日集資金額
                           </td>
-                          <td className='table--hide-in-mobile'>每日訂單數</td>
+                          <td className="table--hide-in-mobile">每日訂單數</td>
                           <td>上線廣告花費</td>
                           <td>廣告直接轉換金額</td>
                           {gaViewIdMap[FUND_RAISING] && <td>GA 收益</td>}
                           <td>廣告直接 ROAS</td>
                           <td>總體 ROAS</td>
                           {user.isLogin && (
-                            <td className='table--hide-in-mobile'>備註</td>
+                            <td className="table--hide-in-mobile">備註</td>
                           )}
                         </tr>
                         <tr>
                           <th>總計</th>
-                          <th className='table--hide-in-mobile'>
+                          <th className="table--hide-in-mobile">
                             {format(adAccount.fundRaisingTotal).toDollar()}
                           </th>
-                          <th className='table--hide-in-mobile'>
+                          <th className="table--hide-in-mobile">
                             {format(adAccount.orderCountTotal).toNumber()}
                           </th>
 
@@ -1075,7 +1204,7 @@ function AdAccount({ adAccountId, user }) {
                             ).toFixed(1)}
                           </th>
                           {user.isLogin && (
-                            <th className='table--hide-in-mobile'></th>
+                            <th className="table--hide-in-mobile"></th>
                           )}
                         </tr>
                       </thead>
@@ -1092,12 +1221,12 @@ function AdAccount({ adAccountId, user }) {
                           return (
                             <tr key={`daily-adAccount-data-${index}`}>
                               <th>{date.slice(5)}</th>
-                              <td className='table--hide-in-mobile'>
+                              <td className="table--hide-in-mobile">
                                 {format(
                                   adAccount.fundRaisingDaily[index]
                                 ).toDollar()}
                               </td>
-                              <td className='table--hide-in-mobile'>
+                              <td className="table--hide-in-mobile">
                                 {adAccount.orderCountDaily[index]}
                               </td>
                               <td>
@@ -1119,14 +1248,14 @@ function AdAccount({ adAccountId, user }) {
                               <td>{adAccount.totalRoasDaily[index]}</td>
                               {user.isLogin && (
                                 <td
-                                  className='table--hide-in-mobile'
+                                  className="table--hide-in-mobile"
                                   style={{ padding: '8px' }}
                                 >
                                   <textarea
                                     value={comment[date]}
-                                    className='form-control form-control-sm'
-                                    rows='1'
-                                    cols='20'
+                                    className="form-control form-control-sm"
+                                    rows="1"
+                                    cols="20"
                                     data-date={date}
                                     style={{ overflowY: 'hidden' }}
                                     onChange={handleCommentInputChange}
@@ -1147,16 +1276,16 @@ function AdAccount({ adAccountId, user }) {
           {tabTopic === LEAD && (
             <>
               <div
-                className='container my-3 line-chart'
+                className="container my-3 line-chart"
                 style={{ height: '300px' }}
               >
                 <Line data={leadLineChartData} options={leadLineChartOptions} />
               </div>
-              <div className='adAccount__table adAccount__table--lead'>
-                <div className='adAccount__table-title'>每日數據</div>
-                <div className='container table-responsive'>
-                  <div className='tableFixHead'>
-                    <table className='table'>
+              <div className="adAccount__table adAccount__table--lead">
+                <div className="adAccount__table-title">每日數據</div>
+                <div className="container table-responsive">
+                  <div className="tableFixHead">
+                    <table className="table">
                       <thead>
                         <tr>
                           <td>Date</td>
@@ -1164,26 +1293,26 @@ function AdAccount({ adAccountId, user }) {
                           <td>名單數(FB)</td>
                           {gaViewIdMap[LEAD] && <td>名單數(GA)</td>}
                           <td>
-                            <abbr title='分母以 GA 名單優先，沒有 GA 資料再用 FB 名單數'>
+                            <abbr title="分母以 GA 名單優先，沒有 GA 資料再用 FB 名單數">
                               CPL
                             </abbr>
                           </td>
                           {chatbot && (
-                            <td className='table--hide-in-mobile'>Chatbot</td>
+                            <td className="table--hide-in-mobile">Chatbot</td>
                           )}
                           {chatbot && (
                             <td
-                              title='（chatbot/名單數）'
-                              className='table--hide-in-mobile'
+                              title="（chatbot/名單數）"
+                              className="table--hide-in-mobile"
                             >
                               訂閱率
                             </td>
                           )}
 
-                          <td className='table--hide-in-mobile'>預熱花費</td>
+                          <td className="table--hide-in-mobile">預熱花費</td>
                           {(user.isLogin ||
                             adAccountId === 'act_318137636023754') && (
-                            <td className='table--hide-in-mobile'>備註</td>
+                            <td className="table--hide-in-mobile">備註</td>
                           )}
                         </tr>
                         <tr>
@@ -1203,12 +1332,12 @@ function AdAccount({ adAccountId, user }) {
                                 ).toFixed(1)}
                           </th>
                           {chatbot && (
-                            <th className='table--hide-in-mobile'>
+                            <th className="table--hide-in-mobile">
                               {format(adAccount.chatbotTotal).toNumber()}
                             </th>
                           )}
                           {chatbot && (
-                            <th className='table--hide-in-mobile'>
+                            <th className="table--hide-in-mobile">
                               {format(
                                 (
                                   adAccount.chatbotTotal / adAccount.leadTotal
@@ -1216,11 +1345,11 @@ function AdAccount({ adAccountId, user }) {
                               ).toPercentage()}
                             </th>
                           )}
-                          <th className='table--hide-in-mobile'>
+                          <th className="table--hide-in-mobile">
                             {format(adAccount.preLaunchSpendTotal).toDollar()}
                           </th>
                           {user.isLogin && (
-                            <th className='table--hide-in-mobile'></th>
+                            <th className="table--hide-in-mobile"></th>
                           )}
                         </tr>
                       </thead>
@@ -1261,12 +1390,12 @@ function AdAccount({ adAccountId, user }) {
                                     ).toDollar()}
                               </td>
                               {chatbot && (
-                                <td className='table--hide-in-mobile'>
+                                <td className="table--hide-in-mobile">
                                   {format(chatbot[date]).toNumber()}
                                 </td>
                               )}
                               {chatbot && (
-                                <td className='table--hide-in-mobile'>
+                                <td className="table--hide-in-mobile">
                                   {format(
                                     (chatbot[date]
                                       ? chatbot[date] /
@@ -1277,21 +1406,21 @@ function AdAccount({ adAccountId, user }) {
                                 </td>
                               )}
 
-                              <td className='table--hide-in-mobile'>
+                              <td className="table--hide-in-mobile">
                                 {format(
                                   adAccount.preLaunchSpendDaily[index]
                                 ).toDollar()}
                               </td>
                               {user.isLogin && (
                                 <td
-                                  className='table--hide-in-mobile'
+                                  className="table--hide-in-mobile"
                                   style={{ padding: '8px' }}
                                 >
                                   <textarea
                                     value={comment[date]}
-                                    className='form-control form-control-sm'
-                                    rows='1'
-                                    cols='20'
+                                    className="form-control form-control-sm"
+                                    rows="1"
+                                    cols="20"
                                     data-date={date}
                                     style={{ overflowY: 'hidden' }}
                                     onChange={handleCommentInputChange}
@@ -1311,41 +1440,38 @@ function AdAccount({ adAccountId, user }) {
           {/* Brew 廣告數據 */}
           {tabTopic === BREW && (
             <>
-              {/* <div
-                className='container my-3 line-chart'
+              <div
+                className="container my-3 line-chart"
                 style={{ height: '300px' }}
               >
-                <Line
-                  data={fundRaisingLineChartData}
-                  options={fundRaisingLineChartOptions}
-                />
-              </div> */}
-              <div className='adAccount__table adAccount__table--brew'>
-                <div className='adAccount__table-title'>每日數據</div>
-                <div className='container table-responsive'>
-                  <div className='tableFixHead'>
-                    <table className='table'>
+                <Line data={brewLineChartData} options={brewLineChartOptions} />
+              </div>
+              <div className="adAccount__table adAccount__table--brew">
+                <div className="adAccount__table-title">每日數據</div>
+                <div className="container table-responsive">
+                  <div className="tableFixHead">
+                    <table className="table">
                       <thead>
                         <tr>
                           <td>Date</td>
-                          <td className='table--hide-in-mobile'>
+                          <td className="table--hide-in-mobile">
                             每日集資金額
                           </td>
-                          <td className='table--hide-in-mobile'>每日訂單數</td>
+                          <td className="table--hide-in-mobile">每日訂單數</td>
                           <td>上線廣告花費</td>
                           <td>廣告直接轉換金額</td>
                           <td>廣告直接 ROAS</td>
                           <td>總體 ROAS</td>
                           {user.isLogin && (
-                            <td className='table--hide-in-mobile'>備註</td>
+                            <td className="table--hide-in-mobile">備註</td>
                           )}
                         </tr>
                         <tr>
                           <th>總計</th>
-                          <th className='table--hide-in-mobile'>
+                          <th className="table--hide-in-mobile">
                             {format(brew.totalOrderSum).toDollar()}
                           </th>
-                          <th className='table--hide-in-mobile'>
+                          <th className="table--hide-in-mobile">
                             {format(brew.totalOrderCount).toNumber()}
                           </th>
                           <th>
@@ -1371,7 +1497,7 @@ function AdAccount({ adAccountId, user }) {
                             ).toFixed(1)}
                           </th>
                           {user.isLogin && (
-                            <th className='table--hide-in-mobile'></th>
+                            <th className="table--hide-in-mobile"></th>
                           )}
                         </tr>
                       </thead>
@@ -1381,10 +1507,10 @@ function AdAccount({ adAccountId, user }) {
                             return (
                               <tr key={`daily-adAccount-data-${date}`}>
                                 <th>{date.slice(5)}</th>
-                                <td className='table--hide-in-mobile'>
+                                <td className="table--hide-in-mobile">
                                   {format(orderSum).toDollar()}
                                 </td>
-                                <td className='table--hide-in-mobile'>
+                                <td className="table--hide-in-mobile">
                                   {orderCount}
                                 </td>
                                 <td>
@@ -1410,14 +1536,14 @@ function AdAccount({ adAccountId, user }) {
                                 </td>
                                 {user.isLogin && (
                                   <td
-                                    className='table--hide-in-mobile'
+                                    className="table--hide-in-mobile"
                                     style={{ padding: '8px' }}
                                   >
                                     <textarea
                                       value={comment[date]}
-                                      className='form-control form-control-sm'
-                                      rows='1'
-                                      cols='20'
+                                      className="form-control form-control-sm"
+                                      rows="1"
+                                      cols="20"
                                       data-date={date}
                                       style={{ overflowY: 'hidden' }}
                                       onChange={handleCommentInputChange}
