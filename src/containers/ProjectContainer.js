@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { format } from '../utils/utils'
 import './ProjectContainer.scss'
 
-const ProjectContainer = ({ project, adAccount }) => {
+const ProjectContainer = ({ project, adAccount, gaViewIdMap, leadGAData }) => {
+  const LEAD = 'lead'
   const [countdown, setCountdown] = useState('')
 
   const costPerAverageLead =
@@ -12,20 +13,26 @@ const ProjectContainer = ({ project, adAccount }) => {
 
   if (!project.id) {
     return (
-      <div className='project__ad-stats row'>
-        <div className='col-12 col-sm-4 ad-stats__list'>
-          <div className='ad-stats__key'>名單數</div>
-          <div className='ad-stats__value'>
-            {format(adAccount.leadTotal).toNumber()}
+      <div className="project__ad-stats row">
+        <div className="col-12 col-sm-4 ad-stats__list">
+          <div className="ad-stats__key">名單數</div>
+          <div className="ad-stats__value">
+            {gaViewIdMap[LEAD] && leadGAData.total
+              ? format(leadGAData.total).toNumber()
+              : format(adAccount.leadTotal).toNumber()}
           </div>
         </div>
-        <div className='col-12 col-sm-4 ad-stats__list'>
-          <div className='ad-stats__key'>平均名單取得成本 CPL</div>
-          <div className='ad-stats__value'>{costPerAverageLead}</div>
+        <div className="col-12 col-sm-4 ad-stats__list">
+          <div className="ad-stats__key">平均名單取得成本 CPL</div>
+          <div className="ad-stats__value">
+            {gaViewIdMap[LEAD] && leadGAData.total
+              ? (adAccount.leadSpendTotal / leadGAData.total).toFixed(1)
+              : costPerAverageLead}
+          </div>
         </div>
-        <div className='col-12 col-sm-4 ad-stats__list'>
-          <div className='ad-stats__key'>總花費</div>
-          <div className='ad-stats__value'>
+        <div className="col-12 col-sm-4 ad-stats__list">
+          <div className="ad-stats__key">總花費</div>
+          <div className="ad-stats__value">
             {format(
               adAccount.leadSpendTotal + adAccount.preLaunchSpendTotal
             ).toDollar()}
@@ -69,75 +76,77 @@ const ProjectContainer = ({ project, adAccount }) => {
   }, 1000)
 
   return (
-    <div className='row'>
-      <div className='col-12 col-sm-6 project__image'>
+    <div className="row">
+      <div className="col-12 col-sm-6 project__image">
         <div style={{ backgroundImage: `url(${project.og_image})` }}></div>
       </div>
-      <div className='col-12 col-sm-6 project__ad-stats row'>
-        <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>
+      <div className="col-12 col-sm-6 project__ad-stats row">
+        <div className="col-12 ad-stats__list">
+          <div className="ad-stats__key">
             {/* TODO: 串接其他平台 */}
             <a
               href={'https://www.zeczec.com/projects/' + adAccount.projectId}
-              target='blank'
+              target="blank"
             >
               {project.name}
             </a>
           </div>
-          <div className='ad-stats__value'>{project.funding_current}</div>
+          <div className="ad-stats__value">{project.funding_current}</div>
         </div>
-        <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>上線後廣告花費</div>
-          <div className='ad-stats__value'>
+        <div className="col-12 ad-stats__list">
+          <div className="ad-stats__key">上線後廣告花費</div>
+          <div className="ad-stats__value">
             {format(adAccount.fundRaisingSpendTotal).toDollar()}
           </div>
         </div>
-        <div className='col-12 ad-stats__list'>
-          <div className='ad-stats__key'>上線後廣告占比</div>
-          <div className='ad-stats__value'>
+        <div className="col-12 ad-stats__list">
+          <div className="ad-stats__key">上線後廣告占比</div>
+          <div className="ad-stats__value">
             {format(fundRaisingSpendTotalPerFundingCurrent).toPercentage()}
           </div>
         </div>
       </div>
-      <div className='col-12 project__content'>
-        <div className='row project__content-info'>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>目標</div>
-            <div className='list__value'>{project.funding_target}</div>
+      <div className="col-12 project__content">
+        <div className="row project__content-info">
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">目標</div>
+            <div className="list__value">{project.funding_target}</div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>達成比例</div>
-            <div className='list__value'>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">達成比例</div>
+            <div className="list__value">
               {format(goalPercentage).toNumber()}%
             </div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>贊助人數</div>
-            <div className='list__value'>{project.sponsor_count}</div>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">贊助人數</div>
+            <div className="list__value">{project.sponsor_count}</div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>時程</div>
-            <div className='list__value'>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">時程</div>
+            <div className="list__value">
               {project.started_at} ~ {project.finished_at}
             </div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>倒數</div>
-            <div className='list__value'>{countdown}</div>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">倒數</div>
+            <div className="list__value">{countdown}</div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>名單數</div>
-            <div className='list__value'>
-              {format(adAccount.leadTotal).toNumber()}
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">名單數</div>
+            <div className="list__value">
+              {gaViewIdMap[LEAD] && leadGAData.total
+                ? format(leadGAData.total).toNumber()
+                : format(adAccount.leadTotal).toNumber()}
             </div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>平均 CPL</div>
-            <div className='list__value'>{costPerAverageLead}</div>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">平均 CPL</div>
+            <div className="list__value">{costPerAverageLead}</div>
           </div>
-          <div className='col-12 col-sm-6 project__content-info-list'>
-            <div className='list__key'>前測/預熱總花費</div>
-            <div className='list__value'>
+          <div className="col-12 col-sm-6 project__content-info-list">
+            <div className="list__key">前測/預熱總花費</div>
+            <div className="list__value">
               {format(adAccount.leadSpendTotal).toDollar()}
               {' / '}
               {format(adAccount.preLaunchSpendTotal).toDollar()}

@@ -1084,7 +1084,7 @@ function AdAccount({ adAccountId, user }) {
           }
           {/* 集資資料 */}
           <div className="container">
-            <ProjectContainer project={project} adAccount={adAccount} />
+            <ProjectContainer project={project} adAccount={adAccount} gaViewIdMap={gaViewIdMap} leadGAData={leadGAData}/>
           </div>
           {/* 切換 tab */}
           <div className="container">
