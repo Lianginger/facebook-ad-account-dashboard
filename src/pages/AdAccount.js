@@ -654,16 +654,23 @@ function AdAccount({ adAccountId, user }) {
               ? parseInt(adCampaignLeadAction.value)
               : 0
           })
-          if (totalSpend !== 0 && totalLead !== 0) {
+          if (totalSpend !== 0) {
             leadSpendTotal += totalSpend
             leadSpendDaily.push(totalSpend)
-
-            leadTotal += totalLead
-            leadDaily.push(totalLead)
-            costPerLeadDaily.push((totalSpend / totalLead).toFixed(1))
           } else {
             leadSpendDaily.push(null)
+          }
+
+          if (totalLead !== 0) {
+            leadTotal += totalLead
+            leadDaily.push(totalLead)
+          } else {
             leadDaily.push(null)
+          }
+
+          if (totalSpend !== 0 && totalLead !== 0) {
+            costPerLeadDaily.push((totalSpend / totalLead).toFixed(1))
+          } else {
             costPerLeadDaily.push(null)
           }
         } else {
@@ -1084,7 +1091,12 @@ function AdAccount({ adAccountId, user }) {
           }
           {/* 集資資料 */}
           <div className="container">
-            <ProjectContainer project={project} adAccount={adAccount} gaViewIdMap={gaViewIdMap} leadGAData={leadGAData}/>
+            <ProjectContainer
+              project={project}
+              adAccount={adAccount}
+              gaViewIdMap={gaViewIdMap}
+              leadGAData={leadGAData}
+            />
           </div>
           {/* 切換 tab */}
           <div className="container">
@@ -1339,9 +1351,14 @@ function AdAccount({ adAccountId, user }) {
                           {chatbot && (
                             <th className="table--hide-in-mobile">
                               {format(
-                                (
-                                  adAccount.chatbotTotal / adAccount.leadTotal
-                                ).toFixed(3)
+                                gaViewIdMap[LEAD] && leadGAData.total
+                                  ? (
+                                      adAccount.chatbotTotal / leadGAData.total
+                                    ).toFixed(3)
+                                  : (
+                                      adAccount.chatbotTotal /
+                                      adAccount.leadTotal
+                                    ).toFixed(3)
                               ).toPercentage()}
                             </th>
                           )}
@@ -1398,8 +1415,10 @@ function AdAccount({ adAccountId, user }) {
                                 <td className="table--hide-in-mobile">
                                   {format(
                                     (chatbot[date]
-                                      ? chatbot[date] /
-                                        adAccount.leadDaily[index]
+                                      ? gaViewIdMap[LEAD] && leadGAData.total
+                                        ? chatbot[date] / leadGAData[date]
+                                        : chatbot[date] /
+                                          adAccount.leadDaily[index]
                                       : 0
                                     ).toFixed(3)
                                   ).toPercentage()}
