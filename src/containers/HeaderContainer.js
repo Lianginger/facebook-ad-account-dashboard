@@ -45,7 +45,7 @@ const HeaderContainer = ({
         appId: '2772453809519165',
         cookie: true,
         xfbml: true,
-        version: 'v12.0',
+        version: 'v14.0',
       })
 
       window.FB.AppEvents.logPageView()
@@ -60,54 +60,54 @@ const HeaderContainer = ({
       js = d.createElement(s)
       js.id = id
       js.src =
-        'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v12.0&appId=2772453809519165&autoLogAppEvents=1'
+        'https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v14.0&appId=2772453809519165&autoLogAppEvents=1'
       fjs.parentNode.insertBefore(js, fjs)
     })(document, 'script', 'facebook-jssdk')
   }, [])
 
   return (
-    <header className='header'>
-      <div className='header__line-left'>
+    <header className="header">
+      <div className="header__line-left">
         {!isHome && (
-          <div className='header__back-to-home' onClick={() => navigate('/')}>
-            <SvgArrowLeft className='header__arrow-left' />
-            <span className='header__back-to-home-text'>Home</span>
+          <div className="header__back-to-home" onClick={() => navigate('/')}>
+            <SvgArrowLeft className="header__arrow-left" />
+            <span className="header__back-to-home-text">Home</span>
           </div>
         )}
-        <div className='header__title'>{title}</div>
+        <div className="header__title">{title}</div>
       </div>
-      <SvgLogo className='header__logo' />
-      <div className='header__line-right'></div>
-      <div className='header__account'>
+      <SvgLogo className="header__logo" />
+      <div className="header__line-right"></div>
+      <div className="header__account">
         {user.isLoading && (
           <div
-            className='spinner-border text-primary spinner-border-sm mx-3'
-            role='status'
+            className="spinner-border text-primary spinner-border-sm mx-3"
+            role="status"
           >
-            <span className='sr-only'>Loading...</span>
+            <span className="sr-only">Loading...</span>
           </div>
         )}
         {user.isNoAuth && !user.isLoading ? (
-          <span className='text-danger'>你沒有權限</span>
+          <span className="text-danger">你沒有權限</span>
         ) : (
           ''
         )}
         {/* Avatar、登出 */}
         {user.isLogin && !user.isLoading ? (
-          <div className='text-right'>
+          <div className="text-right">
             <div
-              className='bg-primary rounded'
+              className="bg-primary rounded"
               onClick={() => {
                 setUser(false)
                 setAdAccounts(false)
               }}
             >
-              <div className='d-flex align-items-center'>
-                <span className='mx-2 text-light font-weight-bold'>登出</span>
+              <div className="d-flex align-items-center">
+                <span className="mx-2 text-light font-weight-bold">登出</span>
                 <img
                   src={user.pictureURL}
-                  alt='avatar'
-                  className='rounded'
+                  alt="avatar"
+                  className="rounded"
                   style={{ width: '28px' }}
                 />
               </div>
@@ -117,17 +117,17 @@ const HeaderContainer = ({
           ''
         )}
         {/* 臉書登入 */}
-        <div className='w-100 text-center'>
+        <div className="w-100 text-center">
           <div
-            className='fb-login-button'
-            data-size='medium'
-            data-button-type='continue_with'
-            data-layout='default'
-            data-auto-logout-link='false'
-            data-use-continue-as='true'
-            data-width=''
-            data-onlogin='checkLoginState();'
-            data-scope='public_profile,email,ads_read'
+            className="fb-login-button"
+            data-size="medium"
+            data-button-type="continue_with"
+            data-layout="default"
+            data-auto-logout-link="false"
+            data-use-continue-as="true"
+            data-width=""
+            data-onlogin="checkLoginState();"
+            data-scope="public_profile,email,ads_read"
             style={{
               display:
                 user.isLogin || user.isLoading || user.isNoAuth
