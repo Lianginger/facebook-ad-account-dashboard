@@ -418,17 +418,33 @@ function AdAccount({ adAccountId, user }) {
     fetchBrewData()
 
     function fetchAdAccountInfo() {
+      // 先跟資料庫拿資料，沒有再拿舊的廣告帳戶 business_street 來源
       fetch(
-        // `http://localhost:8000/ad-account/info/${adAccountId}`
-        `https://syphon-api.crowdfunding.coffee/ad-account/info/${adAccountId}`
+        // `http://localhost:3050/api/adAccountId/${adAccountId}/adAccountInfo/`
+        `https://drip-plugin.crowdfunding.coffee/api/adAccountId/${adAccountId}/adAccountInfo/`
       )
         .then((res) => res.json())
-        .then((res) => {
-          setAdAccount((state) => {
-            state.name = res.name
-            state.platformId = res.business_street
-            state.projectId = res.business_street2
-          })
+        .then((responseFromDB) => {
+          if (responseFromDB !== null) {
+            setAdAccount((state) => {
+              state.platformId = responseFromDB.platformId
+              state.projectId = responseFromDB.projectId
+            })
+          }
+          fetch(
+            // `http://localhost:8000/ad-account/info/${adAccountId}`
+            `https://syphon-api.crowdfunding.coffee/ad-account/info/${adAccountId}`
+          )
+            .then((res) => res.json())
+            .then((res) => {
+              setAdAccount((state) => {
+                state.name = res.name
+                if (responseFromDB === null) {
+                  state.platformId = res.business_street
+                  state.projectId = res.business_street2
+                }
+              })
+            })
         })
     }
 
@@ -1089,6 +1105,48 @@ function AdAccount({ adAccountId, user }) {
               </div>
             </div>
           }
+          {/* AdAccountInfo */}
+          {
+            <div className="container">
+              <div className="row ga-view-id">
+                <div className="col-sm-12 col-md-12 ga-view-id-group">
+                  <label htmlFor="adAccountInfo-platformId">platformId</label>
+                  <input
+                    id="adAccountInfo-platformId"
+                    value={adAccount.platformId}
+                    onChange={(event) => {
+                      event.persist()
+                      setAdAccount((state) => {
+                        state.platformId = event.target.value
+                      })
+                    }}
+                    disabled={!user.isLogin}
+                  />
+                  <label htmlFor="adAccountInfo-projectId">projectId</label>
+                  <input
+                    id="adAccountInfo-projectId"
+                    value={adAccount.projectId}
+                    onChange={(event) => {
+                      event.persist()
+                      setAdAccount((state) => {
+                        state.projectId = event.target.value
+                      })
+                    }}
+                    disabled={!user.isLogin}
+                  />
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => {
+                      updateAdAccountInfo()
+                      setNumberOfReload((state) => state + 1)
+                    }}
+                  >
+                    更新
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
           {/* 集資資料 */}
           <div className="container">
             <ProjectContainer
@@ -1623,6 +1681,24 @@ function AdAccount({ adAccountId, user }) {
           adAccountId,
           topic,
           viewId,
+        }),
+      }
+    )
+  }
+
+  function updateAdAccountInfo() {
+    fetch(
+      // `http://localhost:3050/api/adAccountInfo/insert`,
+      `https://drip-plugin.crowdfunding.coffee/api/adAccountInfo/insert`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          adAccountId,
+          platformId: adAccount.platformId,
+          projectId: adAccount.projectId,
         }),
       }
     )
